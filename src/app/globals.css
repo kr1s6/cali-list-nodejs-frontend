@@ -8,22 +8,43 @@
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
-  --secondary: #F5F5F5;
-  --secondary-content: #D1D5DB;
+  --color-base-100: oklch(0.95 0.016 252.42);
 }
 
 @plugin "daisyui/theme" {
   name: "dark";
   default: false;
-  --secondary: #F5F5F5;
-  --secondary-content: #D1D5DB;
+  --color-base-100: oklch(25.33% .016 252.42);
 }
 
-/* Modifications to daisyUI classes */
+/******* Modifications to daisyUI classes ********/
+.navbar {
+  background-color: color-mix(in oklch, var(--color-base-100), transparent 50%);
+}
+
 .btn-primary {
   @apply shadow-none transition-all duration-300 transform;
 
   &:hover {
     @apply shadow-lg shadow-primary/30 scale-103;
+  }
+}
+
+.btn-ghost {
+  @apply shadow-none transition-all duration-200 transform;
+  &:hover {
+    --btn-shadow: none;
+    --btn-bg: none;
+    --btn-border: #0000;
+    color: color-mix(in oklch, var(--btn-fg), var(--color-primary) 30%);
+    @apply text-shadow-lg text-shadow-primary/10;
+  }
+}
+
+.toggle {
+  color: var(--base-content);
+  &:hover {
+    color: color-mix(in oklch, var(--color-base-content), var(--color-primary) 30%);
+    @apply shadow-lg shadow-primary/10;
   }
 }
