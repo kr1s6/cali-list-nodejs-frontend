@@ -1,26 +1,29 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "daisyui" {
+  themes: light --default, dark;
+  /* make variable of dark and place it in theme-change.js */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --secondary: #F5F5F5;
+  --secondary-content: #D1D5DB;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: false;
+  --secondary: #F5F5F5;
+  --secondary-content: #D1D5DB;
+}
+
+/* Modifications to daisyUI classes */
+.btn-primary {
+  @apply shadow-none transition-all duration-300 transform;
+
+  &:hover {
+    @apply shadow-lg shadow-primary/30 scale-103;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
