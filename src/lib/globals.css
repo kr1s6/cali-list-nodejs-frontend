@@ -8,13 +8,11 @@
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
-  --color-base-100: oklch(0.95 0.016 252.42);
 }
 
 @plugin "daisyui/theme" {
   name: "dark";
   default: false;
-  --color-base-100: oklch(25.33% .016 252.42);
 }
 
 /******* Modifications to daisyUI classes ********/
@@ -36,8 +34,8 @@
     --btn-shadow: none;
     --btn-bg: none;
     --btn-border: #0000;
-    color: color-mix(in oklch, var(--btn-fg), var(--color-primary) 30%);
-    @apply text-shadow-lg text-shadow-primary/10;
+    color: color-mix(in oklch, var(--btn-fg), var(--color-primary) 20%);
+    @apply text-shadow-md text-shadow-primary/5;
   }
 }
 

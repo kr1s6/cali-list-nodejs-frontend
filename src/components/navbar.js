@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import Link from "next/link";
 import ThemeChangeBtn from "./theme-change";
 
 export default function Navbar() {
@@ -6,12 +6,12 @@ export default function Navbar() {
         <div className="navbar shadow-md justify-around">
             <div className="navbar p-0 min-h-0 max-w-5xl mx-10">
                 <div className="navbar-start">
-                    <a className="btn btn-ghost text-xl">CaliList</a>
+                    <Link href="/" className="btn btn-ghost text-xl">CaliList</Link>
                     <ThemeChangeBtn></ThemeChangeBtn>
                 </div>
                 <div className="navbar-end">
-                    <a className="btn btn-ghost">Login</a>
-                    <a className="btn btn-primary">Sign Up</a>
+                    <Link href="/login" className="btn btn-ghost">Login</Link>
+                    <Link href="/registration" className="btn btn-primary">Sign Up</Link>
                 </div>
             </div>
         </div>
