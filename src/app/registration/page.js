@@ -1,3 +1,27 @@
+import Link from "next/link";
+
 export default function Registration() {
-    return <></>
-  }
+  return (
+    <div className="hero min-h-[60vh]">
+      <fieldset className="fieldset bg-base-200 border-neutral/10 rounded-box 
+      w-xs border p-4 inset-shadow-sm inset-shadow-base-300">
+        <legend className="fieldset-legend">Registration</legend>
+
+        <label className="label">Name</label>
+        <input type="name" className="input" placeholder="Name" />
+
+        <label className="label">Email</label>
+        <input type="email" className="input" placeholder="Email" />
+
+        <label className="label">Password</label>
+        <input type="password" className="input" placeholder="Password" />
+
+        <button className="btn btn-neutral mt-4">Login</button>
+
+        <div className="mt-2 w-full flex justify-end">
+          <Link href="/login" className="link link-hover">Login to existing account</Link>
+        </div>
+      </fieldset>
+    </div>
+  );
+}
