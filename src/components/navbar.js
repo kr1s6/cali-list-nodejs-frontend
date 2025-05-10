@@ -7,7 +7,6 @@ export default function Navbar() {
             <div className="navbar p-0 min-h-0 max-w-5xl mx-10">
                 <div className="navbar-start">
                     <Link href="/" className="btn btn-ghost text-xl">CaliList</Link>
-                    <ThemeChangeBtn></ThemeChangeBtn>
                 </div>
                 <div className="navbar-end">
                     <Link href="/login" className="btn btn-ghost">Login</Link>

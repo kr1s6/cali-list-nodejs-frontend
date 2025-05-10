@@ -20,6 +20,12 @@
   background-color: color-mix(in oklch, var(--color-base-100), transparent 50%);
 }
 
+.footer{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+
 .btn-primary {
   @apply shadow-none transition-all duration-300 transform;
 
