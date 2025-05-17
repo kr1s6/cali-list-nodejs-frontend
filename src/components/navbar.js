@@ -1,5 +1,4 @@
 import Link from "next/link";
-import ThemeChangeBtn from "./theme-change";
 
 export default function Navbar() {
     return (

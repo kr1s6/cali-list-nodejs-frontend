@@ -2,12 +2,18 @@
 import { useEffect, useState } from "react";
 
 export default function ThemeChangeBtn() {
-    const [isDark, setIsDark] = useState(
-        localStorage.getItem("isDark") === "true"
-    );
+    const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem("isDark", isDark);
+        if (typeof window !== "undefined") {
+            const saved = localStorage.getItem("isDark");
+            const initialValue = JSON.parse(saved);
+            setIsDark(initialValue);
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem("isDark", JSON.stringify(isDark));
     }, [isDark]);
 
     const handleChange = () => {
