@@ -101,16 +101,3 @@
   display: block;
   color: var(--color-error) /* var(--color-error) */;
 }
-
-.custom-validator {
-  &:user-valid, &:has(:user-valid) {
-    &, &:focus, &:checked, [aria-checked="true"], &:focus-within {
-      --input-color: inherit;
-    }
-  }
-  &:user-invalid, &:has(:user-invalid), &[aria-invalid] {
-        &, &:focus, &:checked, &[aria-checked="true"], &:focus-within {
-            --input-color: var(--color-error) /* var(--color-error) */;
-        }
-    }
-}

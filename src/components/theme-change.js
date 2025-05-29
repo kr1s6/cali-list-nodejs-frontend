@@ -2,19 +2,23 @@
 import { useEffect, useState } from "react";
 
 export default function ThemeChangeBtn() {
-    const [isDark, setIsDark] = useState(false);
+    const [isDark, setIsDark] = useState(null);
 
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("isDark");
-            const initialValue = JSON.parse(saved);
-            setIsDark(initialValue);
-        }
+        const saved = localStorage.getItem("isDark");
+        const initialValue = saved !== null ? JSON.parse(saved) : false;
+        setIsDark(initialValue);
     }, []);
 
     useEffect(() => {
-        localStorage.setItem("isDark", JSON.stringify(isDark));
+        if (isDark !== null) {
+            localStorage.setItem("isDark", JSON.stringify(isDark));
+        }
     }, [isDark]);
+
+    if (isDark === null) {
+        return null;
+    }
 
     const handleChange = () => {
         setIsDark(!isDark);
@@ -24,6 +28,7 @@ export default function ThemeChangeBtn() {
         <label className="flex cursor-pointer gap-2">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
+                aria-label="Light theme"
                 width="20" height="20" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="5" />
@@ -33,11 +38,13 @@ export default function ThemeChangeBtn() {
             <input
                 type="checkbox"
                 value="dark"
+                aria-label="Theme switch"
                 className="toggle theme-controller"
                 onChange={handleChange}
                 checked={isDark} />
             <svg
                 xmlns="http://www.w3.org/2000/svg"
+                aria-label="Dark theme"
                 width="20" height="20" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
