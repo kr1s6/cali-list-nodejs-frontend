@@ -3,6 +3,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 export default function Registration() {
+  const [isDisabled, setIsDisabled] = useState(true);
+
   const [nameIsTouched, nameSetIsTouched] = useState(false);
   const [emailIsTouched, setEmailIsTouched] = useState(false);
   const [passwordIsTouched, passwordSetIsTouched] = useState(false);
@@ -25,6 +27,14 @@ export default function Registration() {
     name: useRef(null),
     email: useRef(null),
   };
+
+  useEffect(() => {
+    if (nameIsValid && emailIsValid && isValidLength && isOneNumber && isOneLowerCase && isOneUpperCase) {
+      setIsDisabled(false);
+    } else {
+      setIsDisabled(true);
+    }
+  }, [nameIsValid, emailIsValid, isValidLength, isOneNumber, isOneLowerCase, isOneUpperCase]);
 
   useEffect(() => {
     if (refs.name.current) {
@@ -118,7 +128,7 @@ export default function Registration() {
           )}
         </div>
 
-        <button className="btn btn-neutral mt-4" onClick={registrationPostRequest}>Register</button>
+        <button className="btn btn-neutral mt-4" disabled={isDisabled} onClick={registrationPostRequest}>Register</button>
         <div className="mt-2 w-full flex justify-end">
           <Link href="/login" className="link link-hover">Login to existing account</Link>
         </div>
