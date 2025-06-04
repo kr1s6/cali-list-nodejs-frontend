@@ -1,12 +1,16 @@
 'use client'
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function Registration() {
   const [isDisabled, setIsDisabled] = useState(true);
+  const [isBackendError, setIsBackendError] = useState(false);
+  const [errorValue, setErrorValue] = useState(null);
+  const router = useRouter();
 
   const [nameIsTouched, nameSetIsTouched] = useState(false);
-  const [emailIsTouched, setEmailIsTouched] = useState(false);
+  const [emailIsTouched, emailSetIsTouched] = useState(false);
   const [passwordIsTouched, passwordSetIsTouched] = useState(false);
 
   const [nameValue, setNameValue] = useState('');
@@ -61,10 +65,8 @@ export default function Registration() {
       email: emailValue,
       password: passwordValue,
     };
-    console.log("Request body:", JSON.stringify(requestBody));
-
     try {
-      const response = await fetch("http://localhost:8080/api/register", {
+      const response = await fetch("http://localhost:8080/api/user", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -73,16 +75,21 @@ export default function Registration() {
       });
 
       if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(`Error ${response.status}: ${errorMessage}`);
+        const error = await response.text();
+        setErrorValue(error);
+        setIsBackendError(true);
+        console.log(`Error ${response.status}: ${error}`);
+        return;
+      } else {
+        setIsBackendError(false);
       }
 
       const json = await response.json();
       console.log("Response:", json);
 
     } catch (error) {
-      console.error('An error occurred:', error.message);
       console.log('An error occurred:', error.message);
+      router.push('/error');
     }
   };
 
@@ -103,7 +110,7 @@ export default function Registration() {
         <label htmlFor="emailInput" className="label">Email</label>
         <input ref={refs.email} id="emailInput" type="email" className="input" placeholder="Email" required
           value={emailValue} onChange={e => setEmailValue(e.target.value)}
-          onBlur={() => setEmailIsTouched(true)} />
+          onBlur={() => emailSetIsTouched(true)} />
         {emailIsTouched && !emailIsValid && (
           <div className="validator-hint">Enter valid email address</div>
         )}
@@ -129,6 +136,8 @@ export default function Registration() {
         </div>
 
         <button className="btn btn-neutral mt-4" disabled={isDisabled} onClick={registrationPostRequest}>Register</button>
+        {isBackendError && (<p className="validator-hint">{errorValue}</p>)}
+
         <div className="mt-2 w-full flex justify-end">
           <Link href="/login" className="link link-hover">Login to existing account</Link>
         </div>
