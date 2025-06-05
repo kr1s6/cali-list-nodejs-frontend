@@ -66,7 +66,7 @@ export default function Registration() {
       password: passwordValue,
     };
     try {
-      const response = await fetch("http://localhost:8080/api/user", {
+      const response = await fetch("http://localhost:8080/api/user/register", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -80,12 +80,12 @@ export default function Registration() {
         setIsBackendError(true);
         console.log(`Error ${response.status}: ${error}`);
         return;
-      } else {
-        setIsBackendError(false);
       }
 
-      const json = await response.json();
-      console.log("Response:", json);
+      setIsBackendError(false);
+      const successMessage = await response.text();
+      console.log("Response:", successMessage);
+      // router.push();
 
     } catch (error) {
       console.log('An error occurred:', error.message);
