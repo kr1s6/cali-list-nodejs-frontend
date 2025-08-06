@@ -1,5 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## How to set up project:
+1. Download Next.js
+2. If you have error "running scripts is disabled on this system"
+Then open PowerShell as Admin and if on command "Get-ExecutionPolicy" you get value "restricted" then use command "Set-ExecutionPolicy RemoteSigned"
+3. In project terminal use command "npm install"
+
 ## Getting Started
 
 First, run the development server:
