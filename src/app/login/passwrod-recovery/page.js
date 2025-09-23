@@ -1,8 +1,7 @@
 export default function Login() {
   return (
     <div className="hero min-h-[60vh]">
-      <fieldset className="fieldset bg-base-200 border-neutral/10 rounded-box 
-      w-xs border p-4 inset-shadow-sm inset-shadow-base-300">
+      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend className="fieldset-legend">Password recovery</legend>
 
         <label className="label">Email</label>

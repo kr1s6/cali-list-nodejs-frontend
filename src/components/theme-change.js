@@ -2,27 +2,33 @@
 import { useEffect, useState } from "react";
 
 export default function ThemeChangeBtn() {
-    const [darkTheme, setDarkTheme] = useState(null);
+    const themes = {
+        light: "Light",
+        dark: "Dark"
+    };
+    const [theme, setTheme] = useState(null);
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem("darkTheme");
-        const initialValue = savedTheme !== null ? JSON.parse(savedTheme) : false;
-        setDarkTheme(initialValue);
+        const localStorageTheme = localStorage.getItem("theme");
+        const initialTheme = localStorageTheme === null ? themes.light : JSON.parse(localStorageTheme);
+        setTheme(initialTheme);
     }, []);
 
     useEffect(() => {
-        if (darkTheme !== null) {
-            localStorage.setItem("darkTheme", JSON.stringify(darkTheme));
+        if (theme !== null) {
+            localStorage.setItem("theme", JSON.stringify(theme));
         }
-    }, [darkTheme]);
-
-    if (darkTheme === null) {
-        return null;
-    }
+    }, [theme]);
 
     const handleChange = () => {
-        setDarkTheme(!darkTheme);
+        const newTheme = theme === themes.light ? themes.dark : themes.light;
+        setTheme(newTheme);
     };
+
+    // Prevents loading of unfinished component
+    if (theme === null) {
+        return null;
+    }
 
     return (
         <label className="flex cursor-pointer gap-2">
@@ -41,7 +47,7 @@ export default function ThemeChangeBtn() {
                 aria-label="Theme switch"
                 className="toggle theme-controller"
                 onChange={handleChange}
-                checked={darkTheme} />
+                checked={theme === themes.dark ? true : false} />
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 aria-label="Dark theme"
