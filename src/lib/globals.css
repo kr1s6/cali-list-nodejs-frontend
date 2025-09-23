@@ -16,10 +16,10 @@
   --color-accent-content: oklch(38% .063 188.416);
   --color-neutral: oklch(14% .005 285.823);
   --color-neutral-content: oklch(92% .004 286.32);
-  --color-base-100: oklch(98% 0.01 236.73);
-  --color-base-200: oklch(96% 0.01 236.73);
-  --color-base-300: oklch(94% 0.01 236.73);
-  --color-base-content: oklch(5% .006 285.885);
+  /* --color-base-100: oklch(100% 0 0); */
+  /* --color-base-200: oklch(96% 0.01 236.73); */
+  /* --color-base-300: oklch(94% 0.01 236.73); */
+  /* --color-base-content: oklch(5% .006 285.885); */
   --color-info: oklch(74% .16 232.661);
   --color-info-content: oklch(29% .066 243.157);
   --color-success: oklch(76% .177 163.223);
@@ -71,18 +71,6 @@
 
   &:hover {
     @apply shadow-lg shadow-primary/30 scale-103;
-  }
-}
-
-.btn-ghost {
-  @apply shadow-none transition-all duration-200 transform;
-
-  &:hover {
-    --btn-shadow: none;
-    --btn-bg: none;
-    --btn-border: oklch(1 0 none / 0);
-    color: color-mix(in oklch, var(--btn-fg), var(--color-primary) 0%);
-    @apply text-shadow-md text-shadow-primary/5;
   }
 }
 

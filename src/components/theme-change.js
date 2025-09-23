@@ -2,26 +2,26 @@
 import { useEffect, useState } from "react";
 
 export default function ThemeChangeBtn() {
-    const [isDark, setIsDark] = useState(null);
+    const [darkTheme, setDarkTheme] = useState(null);
 
     useEffect(() => {
-        const saved = localStorage.getItem("isDark");
-        const initialValue = saved !== null ? JSON.parse(saved) : false;
-        setIsDark(initialValue);
+        const savedTheme = localStorage.getItem("darkTheme");
+        const initialValue = savedTheme !== null ? JSON.parse(savedTheme) : false;
+        setDarkTheme(initialValue);
     }, []);
 
     useEffect(() => {
-        if (isDark !== null) {
-            localStorage.setItem("isDark", JSON.stringify(isDark));
+        if (darkTheme !== null) {
+            localStorage.setItem("darkTheme", JSON.stringify(darkTheme));
         }
-    }, [isDark]);
+    }, [darkTheme]);
 
-    if (isDark === null) {
+    if (darkTheme === null) {
         return null;
     }
 
     const handleChange = () => {
-        setIsDark(!isDark);
+        setDarkTheme(!darkTheme);
     };
 
     return (
@@ -41,7 +41,7 @@ export default function ThemeChangeBtn() {
                 aria-label="Theme switch"
                 className="toggle theme-controller"
                 onChange={handleChange}
-                checked={isDark} />
+                checked={darkTheme} />
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 aria-label="Dark theme"
