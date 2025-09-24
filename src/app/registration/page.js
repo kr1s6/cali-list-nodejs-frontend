@@ -2,75 +2,57 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
+import { HEADERS, HREF, REGISTER_ENDPOINT, USER_CONSTANTS } from "lib/constants";
 
 export default function Registration() {
-  const [isDisabled, setIsDisabled] = useState(true);
+
+  const [submitBtnIsDisabled, setSubmitBtnIsDisabled] = useState(true);
   const [isBackendError, setIsBackendError] = useState(false);
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
 
-  const [nameIsTouched, nameSetIsTouched] = useState(false);
-  const [emailIsTouched, emailSetIsTouched] = useState(false);
-  const [passwordIsTouched, passwordSetIsTouched] = useState(false);
+  const [isFormTouched, setIsFormTouched] = useState({
+    username: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  })
 
-  const [nameValue, setNameValue] = useState('');
-  const [emailValue, setEmailValue] = useState('');
-  const [passwordValue, setPasswordValue] = useState('');
-
-  const [nameIsValid, nameSetIsValid] = useState(false);
-  const [emailIsValid, setEmailIsValid] = useState(false);
-  const [isValidLength, setIsValidLength] = useState(false);
-  const [isOneNumber, setIsOneNumber] = useState(false);
-  const [isOneLowerCase, setIsOneLowerCase] = useState(false);
-  const [isOneUpperCase, setIsOneUpperCase] = useState(false);
-  const minOneNumberRegex = /\d/;
-  const minOneLowerCaseRegex = /[a-z]/;
-  const minOneUpperCaseRegex = /[A-Z]/;
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const refs = {
-    name: useRef(null),
+    username: useRef(null),
     email: useRef(null),
   };
 
-  useEffect(() => {
-    if (nameIsValid && emailIsValid && isValidLength && isOneNumber && isOneLowerCase && isOneUpperCase) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
-    }
-  }, [nameIsValid, emailIsValid, isValidLength, isOneNumber, isOneLowerCase, isOneUpperCase]);
+  const isValid = {
+    username: refs.username.current?.checkValidity() ?? false,
+    email: refs.email.current?.checkValidity() ?? false,
+    password: form.password.length >= 8,
+    confirmPassword: form.confirmPassword === form.password,
+  }
 
+  const formIsValid = isValid.username && isValid.email && isValid.password && isValid.confirmPassword;
   useEffect(() => {
-    if (refs.name.current) {
-      nameSetIsValid(refs.name.current.checkValidity());
-    }
-  }, [nameValue]);
-
-  useEffect(() => {
-    if (refs.email.current) {
-      setEmailIsValid(refs.email.current.checkValidity());
-    }
-  }, [emailValue]);
-
-  useEffect(() => {
-    setIsValidLength(passwordValue.length >= 8);
-    setIsOneNumber(minOneNumberRegex.test(passwordValue));
-    setIsOneLowerCase(minOneLowerCaseRegex.test(passwordValue));
-    setIsOneUpperCase(minOneUpperCaseRegex.test(passwordValue));
-  }, [passwordValue]);
+    setSubmitBtnIsDisabled(!formIsValid)
+  }, [formIsValid]);
 
   const registrationPostRequest = async () => {
     const requestBody = {
-      name: nameValue,
-      email: emailValue,
-      password: passwordValue,
+      name: form.username,
+      email: form.email,
+      password: form.password,
+      confirmPassword: form.confirmPassword,
     };
     try {
-      const response = await fetch("http://localhost:8080/api/user/register", {
+      const response = await fetch(REGISTER_ENDPOINT, {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: HEADERS,
         body: JSON.stringify(requestBody),
       });
 
@@ -95,51 +77,83 @@ export default function Registration() {
 
   return (
     <div className="hero min-h-[60vh]">
-      <fieldset className="fieldset bg-base-300 border-neutral/10 rounded-box w-xs border p-4 inset-shadow-sm 
-        inset-shadow-base-300">
+      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend className="fieldset-legend">Registration</legend>
 
-        <label htmlFor="nameInput" className="label">Name</label>
-        <input ref={refs.name} id="nameInput" type="text" className="input" placeholder="Name" maxLength="30" required
-          value={nameValue} onChange={e => setNameValue(e.target.value)}
-          onBlur={() => nameSetIsTouched(true)} />
-        {nameIsTouched && !nameIsValid && (
-          <div className="validator-hint">Enter name</div>
+        <label htmlFor="usernameInput" className="label">Username</label>
+        <input
+          ref={refs.username}
+          id="usernameInput"
+          type="text"
+          className="input"
+          placeholder="Username"
+          maxLength={USER_CONSTANTS.USERNAME_MAX_LENGTH}
+          required
+          value={form.username}
+          onChange={e => setForm({ ...form, username: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, username: true })}
+        />
+        {isFormTouched.username && !isValid.username && (
+          <p className="validator-hint">Enter unique username.</p>
         )}
 
         <label htmlFor="emailInput" className="label">Email</label>
-        <input ref={refs.email} id="emailInput" type="email" className="input" placeholder="Email" required
-          value={emailValue} onChange={e => setEmailValue(e.target.value)}
-          onBlur={() => emailSetIsTouched(true)} />
-        {emailIsTouched && !emailIsValid && (
-          <div className="validator-hint">Enter valid email address</div>
+        <input
+          ref={refs.email}
+          id="emailInput"
+          type="email"
+          className="input"
+          placeholder="Email"
+          required
+          value={form.email}
+          onChange={e => setForm({ ...form, email: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, email: true })}
+        />
+        {isFormTouched.email && !isValid.email && (
+          <p className="validator-hint">Enter email address.</p>
         )}
 
         <label htmlFor="passInput" className="label">Password</label>
-        <input id="passInput" type="password" className="input" placeholder="Password" minLength="8" required
-          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-          value={passwordValue} onChange={e => setPasswordValue(e.target.value)}
-          onBlur={() => passwordSetIsTouched(true)} />
-        <div>
-          {passwordIsTouched && !isValidLength && (
-            <p className="validator-hint">Must be more than 8 characters</p>
-          )}
-          {passwordIsTouched && !isOneNumber && (
-            <p className="validator-hint">At least one number</p>
-          )}
-          {passwordIsTouched && !isOneLowerCase && (
-            <p className="validator-hint">At least one lowercase letter</p>
-          )}
-          {passwordIsTouched && !isOneUpperCase && (
-            <p className="validator-hint">At least one uppercase letter</p>
-          )}
-        </div>
+        <input
+          id="passInput"
+          type="password"
+          className="input"
+          placeholder="Password"
+          minLength={USER_CONSTANTS.PASSWORD_MIN_LENGTH}
+          maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
+          required
+          value={form.password}
+          onChange={e => setForm({ ...form, password: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, password: true })}
+        />
+        {isFormTouched.password && !isValid.password && (
+          <p className="validator-hint">Minimum 8 characters.</p>
+        )}
 
-        <button className="btn btn-neutral mt-4" disabled={isDisabled} onClick={registrationPostRequest}>Register</button>
-        {isBackendError && (<p className="validator-hint">{errorValue}</p>)}
+        <label htmlFor="confirmPassInput" className="label">Confirm Password</label>
+        <input
+          id="confirmPassInput"
+          type="password"
+          className="input"
+          placeholder="Confirm Password"
+          minLength={USER_CONSTANTS.PASSWORD_MIN_LENGTH}
+          maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
+          required
+          value={form.confirmPassword}
+          onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, confirmPassword: true })}
+        />
+        {isFormTouched.confirmPassword && !isValid.confirmPassword && (
+          <p className="validator-hint">Wrong password.</p>
+        )}
+
+        <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={registrationPostRequest}>Register</button>
+        {isBackendError && (
+          <p className="validator-hint">{errorValue}</p>
+        )}
 
         <div className="mt-2 w-full flex justify-end">
-          <Link href="/login" className="link link-hover">Login to existing account</Link>
+          <Link href={HREF.LOGIN_PAGE} className="link link-hover">Login to existing account.</Link>
         </div>
       </fieldset>
     </div>

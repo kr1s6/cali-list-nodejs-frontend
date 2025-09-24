@@ -2,59 +2,49 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
+import { HEADERS, HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
 
 export default function Login() {
-  const [isDisabled, setIsDisabled] = useState(true);
+  const [submitBtnIsDisabled, setSubmitBtnIsDisabled] = useState(true);
   const [isBackendError, setIsBackendError] = useState(false);
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
 
-  const [emailIsTouched, emailSetIsTouched] = useState(false);
-  const [passwordIsTouched, passwordSetIsTouched] = useState(false);
+  const [isFormTouched, setIsFormTouched] = useState({
+    email: false,
+    password: false,
+  })
 
-  const [emailValue, setEmailValue] = useState('');
-  const [passwordValue, setPasswordValue] = useState('');
-
-  const [emailIsValid, setEmailIsValid] = useState(false);
-  const [passwordIsValid, setPasswordIsValid] = useState(false);
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  });
 
   const refs = {
     password: useRef(null),
     email: useRef(null),
   };
 
-  useEffect(() => {
-    if (passwordIsValid && emailIsValid) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
-    }
-  }, [emailIsValid, passwordIsValid]);
+  const isValid = {
+    email: refs.email.current?.checkValidity() ?? false,
+    password: refs.password.current?.checkValidity() ?? false
+  }
 
+  const formIsValid = isValid.email && isValid.password;
   useEffect(() => {
-    if (refs.email.current) {
-      setEmailIsValid(refs.email.current.checkValidity());
-    }
-  }, [emailValue]);
-
-  useEffect(() => {
-    if (refs.password.current) {
-      setPasswordIsValid(refs.password.current.checkValidity());
-    }
-  }, [passwordValue]);
+    setSubmitBtnIsDisabled(!formIsValid)
+  }, [formIsValid]);
 
 
   const loginPostRequest = async () => {
     const requestBody = {
-      email: emailValue,
-      password: passwordValue,
+      email: form.email,
+      password: form.password,
     };
     try {
-      const response = await fetch("http://localhost:8080/api/user/login", {
+      const response = await fetch(LOGIN_ENDPOINT, {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: HEADERS,
         body: JSON.stringify(requestBody),
       });
 
@@ -79,35 +69,53 @@ export default function Login() {
 
   return (
     <div className="hero min-h-[60vh]">
-      <fieldset className="fieldset bg-base-200 border-neutral/10 rounded-box 
-      w-xs border p-4 inset-shadow-sm inset-shadow-base-300">
+      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend className="fieldset-legend">Login</legend>
 
         <label htmlFor="emailInput" className="label">Email</label>
-        <input ref={refs.email} id="emailInput" className="input" placeholder="Email" required
-          value={emailValue} onChange={e => setEmailValue(e.target.value)}
-          onBlur={() => emailSetIsTouched(true)} />
-        {emailIsTouched && !emailIsValid && (
-          <div className="validator-hint">Enter email address</div>
+        <input
+          ref={refs.email}
+          id="emailInput"
+          type="email"
+          className="input"
+          placeholder="Email"
+          required
+          value={form.email}
+          onChange={e => setForm({ ...form, email: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, email: true })}
+        />
+        {isFormTouched.email && !isValid.email && (
+          <p className="validator-hint">Enter email address.</p>
         )}
 
-        <label htmlFor="passwordInput" className="label">Password</label>
-        <input ref={refs.password} type="password" id="passwordInput" className="input" placeholder="Password" required
-          value={passwordValue} onChange={e => setPasswordValue(e.target.value)}
-          onBlur={() => passwordSetIsTouched(true)} />
-        {passwordIsTouched && !passwordIsValid && (
-          <div className="validator-hint">Enter password</div>
+        <label htmlFor="passInput" className="label">Password</label>
+        <input
+          ref={refs.password}
+          id="passInput"
+          type="password"
+          className="input"
+          placeholder="Password"
+          maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
+          required
+          value={form.password}
+          onChange={e => setForm({ ...form, password: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, password: true })}
+        />
+        {isFormTouched.password && !isValid.password && (
+          <p className="validator-hint">Enter password.</p>
         )}
 
         <div>
-          <Link href="/login/passwrod-recovery" className="link link-hover">Forgot password?</Link>
+          <Link href={HREF.PASSWORD_RECOVERY_PAGE} className="link link-hover">Forgot password?</Link>
         </div>
 
-        <button className="btn btn-neutral mt-4" disabled={isDisabled} onClick={loginPostRequest}>Login</button>
-        {isBackendError && (<p className="validator-hint">{errorValue}</p>)}
+        <button className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={loginPostRequest}>Login</button>
+        {isBackendError && (
+          <p className="validator-hint">{errorValue}</p>
+        )}
 
         <div className="mt-2 w-full flex justify-end">
-          <Link href="/registration" className="link link-hover">Create new account</Link>
+          <Link href={HREF.REGISTRATION_PAGE} className="link link-hover">Create new account</Link>
         </div>
       </fieldset>
     </div>

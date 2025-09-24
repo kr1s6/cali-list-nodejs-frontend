@@ -1,14 +1,14 @@
 @import 'tailwindcss';
 
 @plugin "daisyui" {
-  themes: light --default, dark;
+  themes: lofi --default, dark;
   /* make variable of dark and place it in theme-change.js */
 }
 
 @plugin "daisyui/theme" {
-  name: "light";
+  name: "lofi";
   default: true;
-  --color-primary: oklch(45% .24 277.023);
+  /* --color-primary: oklch(45% .24 277.023);
   --color-primary-content: oklch(93% .034 272.788);
   --color-secondary: oklch(65% .241 354.308);
   --color-secondary-content: oklch(94% .028 342.258);
@@ -16,8 +16,8 @@
   --color-accent-content: oklch(38% .063 188.416);
   --color-neutral: oklch(14% .005 285.823);
   --color-neutral-content: oklch(92% .004 286.32);
-  --color-base-100: oklch(98% 0.01 236.73);
-  --color-base-200: oklch(96% 0.01 236.73);
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: (96% 0.01 236.73);
   --color-base-300: oklch(94% 0.01 236.73);
   --color-base-content: oklch(5% .006 285.885);
   --color-info: oklch(74% .16 232.661);
@@ -27,13 +27,13 @@
   --color-warning: oklch(82% .189 84.429);
   --color-warning-content: oklch(41% .112 45.904);
   --color-error: oklch(65% .194 13.428);
-  --color-error-content: oklch(27% .105 12.094);
+  --color-error-content: oklch(27% .105 12.094); */
 }
 
 @plugin "daisyui/theme" {
   name: "dark";
   default: false;
-  --color-primary: oklch(58% .233 277.117);
+  /* --color-primary: oklch(58% .233 277.117);
   --color-primary-content: oklch(96% .018 272.314);
   --color-secondary: oklch(65% .241 354.308);
   --color-secondary-content: oklch(94% .028 342.258);
@@ -52,7 +52,7 @@
   --color-warning: oklch(82% .189 84.429);
   --color-warning-content: oklch(41% .112 45.904);
   --color-error: oklch(71% .194 13.428);
-  --color-error-content: oklch(27% .105 12.094);
+  --color-error-content: oklch(27% .105 12.094); */
 }
 
 /************** Modifications to daisyUI classes **************/
@@ -71,27 +71,6 @@
 
   &:hover {
     @apply shadow-lg shadow-primary/30 scale-103;
-  }
-}
-
-.btn-ghost {
-  @apply shadow-none transition-all duration-200 transform;
-
-  &:hover {
-    --btn-shadow: none;
-    --btn-bg: none;
-    --btn-border: oklch(1 0 none / 0);
-    color: color-mix(in oklch, var(--btn-fg), var(--color-primary) 0%);
-    @apply text-shadow-md text-shadow-primary/5;
-  }
-}
-
-.toggle {
-  color: var(--base-content);
-
-  &:hover {
-    color: color-mix(in oklch, var(--color-base-content), var(--color-primary) 30%);
-    @apply shadow-lg shadow-primary/10;
   }
 }
 
