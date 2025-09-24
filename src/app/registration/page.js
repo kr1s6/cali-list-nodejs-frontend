@@ -2,80 +2,57 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
+import { HEADERS, HREF, REGISTER_ENDPOINT, USER_CONSTANTS } from "lib/constants";
 
 export default function Registration() {
-  const userConst = {
-    USERNAME_MAX_LENGTH: 30,
-    PASSWORD_MIN_LENGTH: 8,
-    PASSWORD_MAX_LENGTH: 512
-  };
 
-  const [registerBtnIsDisabled, setRegisterBtnIsDisabled] = useState(true);
+  const [submitBtnIsDisabled, setSubmitBtnIsDisabled] = useState(true);
   const [isBackendError, setIsBackendError] = useState(false);
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
 
-  const [usernameIsTouched, usernameSetIsTouched] = useState(false);
-  const [emailIsTouched, emailSetIsTouched] = useState(false);
-  const [passwordIsTouched, passwordSetIsTouched] = useState(false);
-  const [confirmPasswordIsTouched, confirmPasswordSetIsTouched] = useState(false);
+  const [isFormTouched, setIsFormTouched] = useState({
+    username: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  })
 
-  const [usernameValue, setUsernameValue] = useState('');
-  const [emailValue, setEmailValue] = useState('');
-  const [passwordValue, setPasswordValue] = useState('');
-  const [confirmPasswordValue, setConfirmPasswordValue] = useState('');
-
-  const [usernameIsValid, nameSetIsValid] = useState(false);
-  const [emailIsValid, setEmailIsValid] = useState(false);
-  const [passwrodIsValid, setPasswordIsValid] = useState(false);
-  const [confirmPasswordIsValid, setConfirmPasswordIsValid] = useState(false);
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const refs = {
     username: useRef(null),
     email: useRef(null),
   };
 
-  useEffect(() => {
-    if (usernameIsValid && emailIsValid && passwrodIsValid && confirmPasswordIsValid) {
-      setRegisterBtnIsDisabled(false);
-    } else {
-      setRegisterBtnIsDisabled(true);
-    }
-  }, [usernameIsValid, emailIsValid, passwrodIsValid, confirmPasswordIsValid]);
+  const isValid = {
+    username: refs.username.current?.checkValidity() ?? false,
+    email: refs.email.current?.checkValidity() ?? false,
+    password: form.password.length >= 8,
+    confirmPassword: form.confirmPassword === form.password,
+  }
 
+  const formIsValid = isValid.username && isValid.email && isValid.password && isValid.confirmPassword;
   useEffect(() => {
-    if (refs.username.current) {
-      nameSetIsValid(refs.username.current.checkValidity());
-    }
-  }, [usernameValue]);
-
-  useEffect(() => {
-    if (refs.email.current) {
-      setEmailIsValid(refs.email.current.checkValidity());
-    }
-  }, [emailValue]);
-
-  useEffect(() => {
-    setPasswordIsValid(passwordValue.length >= 8);
-  }, [passwordValue]);
-
-  useEffect(() => {
-    setConfirmPasswordIsValid(confirmPasswordValue === passwordValue);
-  }, [confirmPasswordValue, passwordValue]);
+    setSubmitBtnIsDisabled(!formIsValid)
+  }, [formIsValid]);
 
   const registrationPostRequest = async () => {
     const requestBody = {
-      name: usernameValue,
-      email: emailValue,
-      password: passwordValue,
-      confirmPassword: confirmPasswordValue,
+      name: form.username,
+      email: form.email,
+      password: form.password,
+      confirmPassword: form.confirmPassword,
     };
     try {
-      const response = await fetch("http://localhost:8080/register", {
+      const response = await fetch(REGISTER_ENDPOINT, {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: HEADERS,
         body: JSON.stringify(requestBody),
       });
 
@@ -104,48 +81,79 @@ export default function Registration() {
         <legend className="fieldset-legend">Registration</legend>
 
         <label htmlFor="usernameInput" className="label">Username</label>
-        <input ref={refs.username} id="usernameInput" type="text" className="input" placeholder="Username" maxLength={userConst.USERNAME_MAX_LENGTH} required
-          value={usernameValue} onChange={e => setUsernameValue(e.target.value)}
-          onBlur={() => usernameSetIsTouched(true)} />
-        {usernameIsTouched && !usernameIsValid && (
-          <div className="validator-hint">Enter unique username.</div>
+        <input
+          ref={refs.username}
+          id="usernameInput"
+          type="text"
+          className="input"
+          placeholder="Username"
+          maxLength={USER_CONSTANTS.USERNAME_MAX_LENGTH}
+          required
+          value={form.username}
+          onChange={e => setForm({ ...form, username: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, username: true })}
+        />
+        {isFormTouched.username && !isValid.username && (
+          <p className="validator-hint">Enter unique username.</p>
         )}
 
         <label htmlFor="emailInput" className="label">Email</label>
-        <input ref={refs.email} id="emailInput" type="email" className="input" placeholder="Email" required
-          value={emailValue} onChange={e => setEmailValue(e.target.value)}
-          onBlur={() => emailSetIsTouched(true)} />
-        {emailIsTouched && !emailIsValid && (
-          <div className="validator-hint">Enter email address.</div>
+        <input
+          ref={refs.email}
+          id="emailInput"
+          type="email"
+          className="input"
+          placeholder="Email"
+          required
+          value={form.email}
+          onChange={e => setForm({ ...form, email: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, email: true })}
+        />
+        {isFormTouched.email && !isValid.email && (
+          <p className="validator-hint">Enter email address.</p>
         )}
 
         <label htmlFor="passInput" className="label">Password</label>
-        <input id="passInput" type="password" className="input" placeholder="Password"
-          minLength={userConst.PASSWORD_MIN_LENGTH} maxLength={userConst.PASSWORD_MAX_LENGTH} required
-          value={passwordValue} onChange={e => setPasswordValue(e.target.value)}
-          onBlur={() => passwordSetIsTouched(true)} />
-        <div>
-          {passwordIsTouched && !passwrodIsValid && (
-            <p className="validator-hint">Minimum 8 characters.</p>
-          )}
-        </div>
+        <input
+          id="passInput"
+          type="password"
+          className="input"
+          placeholder="Password"
+          minLength={USER_CONSTANTS.PASSWORD_MIN_LENGTH}
+          maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
+          required
+          value={form.password}
+          onChange={e => setForm({ ...form, password: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, password: true })}
+        />
+        {isFormTouched.password && !isValid.password && (
+          <p className="validator-hint">Minimum 8 characters.</p>
+        )}
 
         <label htmlFor="confirmPassInput" className="label">Confirm Password</label>
-        <input id="confirmPassInput" type="password" className="input" placeholder="Confirm Password"
-          minLength={userConst.PASSWORD_MIN_LENGTH} maxLength={userConst.PASSWORD_MAX_LENGTH} required
-          value={confirmPasswordValue} onChange={e => setConfirmPasswordValue(e.target.value)}
-          onBlur={() => confirmPasswordSetIsTouched(true)} />
-        <div>
-          {confirmPasswordIsTouched && !confirmPasswordIsValid && (
-            <p className="validator-hint">Wrong password.</p>
-          )}
-        </div>
+        <input
+          id="confirmPassInput"
+          type="password"
+          className="input"
+          placeholder="Confirm Password"
+          minLength={USER_CONSTANTS.PASSWORD_MIN_LENGTH}
+          maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
+          required
+          value={form.confirmPassword}
+          onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
+          onBlur={() => setIsFormTouched({ ...isFormTouched, confirmPassword: true })}
+        />
+        {isFormTouched.confirmPassword && !isValid.confirmPassword && (
+          <p className="validator-hint">Wrong password.</p>
+        )}
 
-        <button id="registerBtn" className="btn btn-neutral mt-4" disabled={registerBtnIsDisabled} onClick={registrationPostRequest}>Register</button>
-        {isBackendError && (<p className="validator-hint">{errorValue}</p>)}
+        <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={registrationPostRequest}>Register</button>
+        {isBackendError && (
+          <p className="validator-hint">{errorValue}</p>
+        )}
 
         <div className="mt-2 w-full flex justify-end">
-          <Link href="/login" className="link link-hover">Login to existing account.</Link>
+          <Link href={HREF.LOGIN_PAGE} className="link link-hover">Login to existing account.</Link>
         </div>
       </fieldset>
     </div>
