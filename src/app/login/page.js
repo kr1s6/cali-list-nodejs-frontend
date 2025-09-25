@@ -1,12 +1,10 @@
 'use client'
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { HEADERS, HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
 
 export default function Login() {
-  const [submitBtnIsDisabled, setSubmitBtnIsDisabled] = useState(true);
-  const [isBackendError, setIsBackendError] = useState(false);
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
 
@@ -31,9 +29,7 @@ export default function Login() {
   }
 
   const formIsValid = isValid.email && isValid.password;
-  useEffect(() => {
-    setSubmitBtnIsDisabled(!formIsValid)
-  }, [formIsValid]);
+  const submitBtnIsDisabled = !formIsValid
 
 
   const loginPostRequest = async () => {
@@ -41,6 +37,7 @@ export default function Login() {
       email: form.email,
       password: form.password,
     };
+
     try {
       const response = await fetch(LOGIN_ENDPOINT, {
         method: "POST",
@@ -48,17 +45,16 @@ export default function Login() {
         body: JSON.stringify(requestBody),
       });
 
+      const responseJson = await response.json();
+      console.log("Response status:", response.status);
+      console.log("Json Response:", responseJson);
+
       if (!response.ok) {
-        const error = await response.text();
-        setErrorValue(error);
-        setIsBackendError(true);
-        console.log(`Error ${response.status}: ${error}`);
+        setErrorValue(responseJson);
         return;
       }
 
-      setIsBackendError(false);
-      const successMessage = await response.text();
-      console.log("Response:", successMessage);
+      console.log("Response:", responseJson);
       // router.push();
 
     } catch (error) {
@@ -110,8 +106,8 @@ export default function Login() {
         </div>
 
         <button className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={loginPostRequest}>Login</button>
-        {isBackendError && (
-          <p className="validator-hint">{errorValue}</p>
+        {errorValue !== null && (
+          Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
         )}
 
         <div className="mt-2 w-full flex justify-end">

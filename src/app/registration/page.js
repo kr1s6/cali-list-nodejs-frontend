@@ -1,13 +1,10 @@
 'use client'
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { HEADERS, HREF, REGISTER_ENDPOINT, USER_CONSTANTS } from "lib/constants";
+import { HEADERS, HREF, REGISTER_ENDPOINT, STATUS, USER_CONSTANTS } from "lib/constants";
 
 export default function Registration() {
-
-  const [submitBtnIsDisabled, setSubmitBtnIsDisabled] = useState(true);
-  const [isBackendError, setIsBackendError] = useState(false);
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
 
@@ -38,17 +35,16 @@ export default function Registration() {
   }
 
   const formIsValid = isValid.username && isValid.email && isValid.password && isValid.confirmPassword;
-  useEffect(() => {
-    setSubmitBtnIsDisabled(!formIsValid)
-  }, [formIsValid]);
+  const submitBtnIsDisabled = !formIsValid;
 
   const registrationPostRequest = async () => {
     const requestBody = {
-      name: form.username,
+      username: form.username,
       email: form.email,
       password: form.password,
       confirmPassword: form.confirmPassword,
     };
+
     try {
       const response = await fetch(REGISTER_ENDPOINT, {
         method: "POST",
@@ -56,19 +52,22 @@ export default function Registration() {
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        const error = await response.text();
-        setErrorValue(error);
-        setIsBackendError(true);
-        console.log(`Error ${response.status}: ${error}`);
+      const responseJson = await response.json();
+      console.log("Response status:", response.status);
+      console.log("Json Response:", responseJson);
+
+      if (response.status === STATUS.CREATED) {
+        setErrorValue(null);
+        localStorage.setItem("jwt", responseJson.jwt);
+        // router.push();
+      }
+      else if (response.status === STATUS.CONFLICT) {
+        setErrorValue(responseJson);
         return;
       }
-
-      setIsBackendError(false);
-      const successMessage = await response.text();
-      console.log("Response:", successMessage);
-      // router.push();
-
+      else {
+        router.push('/error');
+      }
     } catch (error) {
       console.log('An error occurred:', error.message);
       router.push('/error');
@@ -148,8 +147,8 @@ export default function Registration() {
         )}
 
         <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={registrationPostRequest}>Register</button>
-        {isBackendError && (
-          <p className="validator-hint">{errorValue}</p>
+        {errorValue !== null && (
+          Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
         )}
 
         <div className="mt-2 w-full flex justify-end">
