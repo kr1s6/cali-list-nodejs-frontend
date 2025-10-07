@@ -64,7 +64,7 @@ export default function Login() {
   };
 
   return (
-    <div className="hero min-h-[60vh]">
+    <div className="hero min-h-[70vh]">
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend className="fieldset-legend">Login</legend>
 

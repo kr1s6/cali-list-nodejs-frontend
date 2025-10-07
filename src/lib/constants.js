@@ -1,6 +1,12 @@
 export const REGISTER_ENDPOINT = "http://localhost:8080/register";
 export const LOGIN_ENDPOINT = "http://localhost:8080/login";
-export const HEADERS = { 'Content-Type': 'application/json', }
+export const LOGOUT_ENDPOINT = "http://localhost:8080/logout";
+export const REFRESH_TOKEN_ENDPOINT = "http://localhost:8080/refreshToken";
+
+export const HEADERS = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+}
 
 export const USER_CONSTANTS = {
     USERNAME_MAX_LENGTH: 30,

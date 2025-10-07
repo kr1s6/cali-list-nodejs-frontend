@@ -15,9 +15,9 @@
   --color-accent: oklch(77% .152 181.912);
   --color-accent-content: oklch(38% .063 188.416);
   --color-neutral: oklch(14% .005 285.823);
-  --color-neutral-content: oklch(92% .004 286.32);
-  --color-base-100: oklch(100% 0 0);
-  --color-base-200: (96% 0.01 236.73);
+  --color-neutral-content: oklch(92% .004 286.32); */
+  /* --color-base-100: oklch(100% 0 0); */
+  /* --color-base-200: (96% 0.01 236.73);
   --color-base-300: oklch(94% 0.01 236.73);
   --color-base-content: oklch(5% .006 285.885);
   --color-info: oklch(74% .16 232.661);
@@ -33,37 +33,75 @@
 @plugin "daisyui/theme" {
   name: "dark";
   default: false;
-  /* --color-primary: oklch(58% .233 277.117);
-  --color-primary-content: oklch(96% .018 272.314);
-  --color-secondary: oklch(65% .241 354.308);
-  --color-secondary-content: oklch(94% .028 342.258);
-  --color-accent: oklch(77% .152 181.912);
-  --color-accent-content: oklch(38% .063 188.416);
-  --color-neutral: oklch(14% .005 285.823);
-  --color-neutral-content: oklch(92% .004 286.32);
-  --color-base-100: oklch(25.33% .016 252.42);
-  --color-base-200: oklch(23% .014 253.1);
-  --color-base-300: oklch(22% .012 254.09);
-  --color-base-content: oklch(97.8% .03 256.847);
-  --color-info: oklch(74% .16 232.661);
-  --color-info-content: oklch(29% .066 243.157);
-  --color-success: oklch(76% .177 163.223);
-  --color-success-content: oklch(37% .077 168.94);
-  --color-warning: oklch(82% .189 84.429);
-  --color-warning-content: oklch(41% .112 45.904);
-  --color-error: oklch(71% .194 13.428);
-  --color-error-content: oklch(27% .105 12.094); */
+  /* --color-primary: oklch(58% .233 277.117); */
+  /* --color-primary-content: oklch(96% .018 272.314); */
+  /* --color-secondary: oklch(65% .241 354.308); */
+  /* --color-secondary-content: oklch(94% .028 342.258); */
+  /* --color-accent: oklch(77% .152 181.912); */
+  /* --color-accent-content: oklch(38% .063 188.416); */
+  /* --color-neutral: oklch(14% .005 285.823); */
+  /* --color-neutral-content: oklch(92% .004 286.32); */
+  /* --color-base-100: oklch(25.33% .016 252.42); */
+  /* --color-base-200: oklch(23% .014 253.1); */
+  /* --color-base-300: oklch(22% .012 254.09); */
+  /* --color-base-content: oklch(97.8% .03 256.847); */
+  /* --color-info: oklch(74% .16 232.661); */
+  /* --color-info-content: oklch(29% .066 243.157); */
+  /* --color-success: oklch(76% .177 163.223); */
+  /* --color-success-content: oklch(37% .077 168.94); */
+  /* --color-warning: oklch(82% .189 84.429); */
+  /* --color-warning-content: oklch(41% .112 45.904); */
+  /* --color-error: oklch(71% .194 13.428); */
+  /* --color-error-content: oklch(27% .105 12.094); */
 }
+
+:root {
+  --color-navbar-bg: oklch(23% .014 253.1);
+  --color-navbar-btn-text: var(--color-gray-200);
+  --color-navbar-btn-text-hover: var(--color-white);
+  --color-navbar-btn-primary: oklch(58% .233 277.117);
+  --color-navbar-btn-primary-content: oklch(96% .018 272.314);
+
+  --color-footer-bg: oklch(22% .012 254.09);
+}
+
 
 /************** Modifications to daisyUI classes **************/
 .navbar {
-  background-color: color-mix(in oklch, var(--color-base-100), transparent 50%);
+  background-color: var(--color-navbar-bg);
+
+  .btn {
+    color: var(--color-navbar-btn-text);
+
+    &:hover {
+      color: var(--color-navbar-btn-text-hover);
+    }
+  }
+
+  .btn-primary {
+    --btn-color: var(--color-navbar-btn-primary);
+    --btn-fg: var(--color-navbar-btn-primary-content);
+
+    &:hover {
+      --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-navbar-btn-primary) 30%, transparent) var(--tw-shadow-alpha), transparent);
+    }
+  }
 }
 
 .footer {
   position: fixed;
   left: 0;
   bottom: 0;
+  background-color: var(--color-footer-bg);
+  color: oklch(97.8% .03 256.847);
+
+  .toggle {
+    color: var(--color-navbar-btn-text);
+
+    &:hover {
+      color: var(--color-navbar-btn-text-hover);
+    }
+  }
 }
 
 .btn-primary {
@@ -74,9 +112,19 @@
   }
 }
 
+.btn-ghost {
+  @apply shadow-none transition-none transform-none bg-transparent border-none;
+
+  &:hover {
+    @apply shadow-none scale-100 bg-transparent border-none text-inherit;
+  }
+}
+
 .validator-hint {
   margin-top: 0.05rem;
   visibility: visible;
   display: block;
-  color: var(--color-error) /* var(--color-error) */;
+  color: var(--color-error)
+    /* var(--color-error) */
+  ;
 }

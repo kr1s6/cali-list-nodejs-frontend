@@ -3,10 +3,12 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { HEADERS, HREF, REGISTER_ENDPOINT, STATUS, USER_CONSTANTS } from "lib/constants";
+import { useAuth } from "context/AuthProvider";
 
 export default function Registration() {
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
+  const { setAuthState } = useAuth();
 
   const [isFormTouched, setIsFormTouched] = useState({
     username: false,
@@ -37,7 +39,7 @@ export default function Registration() {
   const formIsValid = isValid.username && isValid.email && isValid.password && isValid.confirmPassword;
   const submitBtnIsDisabled = !formIsValid;
 
-  const registrationPostRequest = async () => {
+  const userRegistration = async () => {
     const requestBody = {
       username: form.username,
       email: form.email,
@@ -46,23 +48,27 @@ export default function Registration() {
     };
 
     try {
-      const response = await fetch(REGISTER_ENDPOINT, {
-        method: "POST",
-        headers: HEADERS,
-        body: JSON.stringify(requestBody),
-      });
-
-      const responseJson = await response.json();
+      const response = await fetch(
+        REGISTER_ENDPOINT,
+        {
+          method: "POST",
+          headers: HEADERS,
+          body: JSON.stringify(requestBody),
+        }
+      );
+      const json = await response.json();
       console.log("Response status:", response.status);
-      console.log("Json Response:", responseJson);
+      console.log("Json Response:", json);
 
-      if (response.status === STATUS.CREATED) {
+      if (response.ok) {
         setErrorValue(null);
-        localStorage.setItem("jwt", responseJson.jwt);
-        // router.push();
+        localStorage.setItem("user", JSON.stringify(json.data));
+        localStorage.setItem("accessToken", json.accessToken);
+        setAuthState({ user: json.data, isAuthenticated: true });
+        router.push('/login');
       }
       else if (response.status === STATUS.CONFLICT) {
-        setErrorValue(responseJson);
+        setErrorValue(json.data);
         return;
       }
       else {
@@ -75,7 +81,7 @@ export default function Registration() {
   };
 
   return (
-    <div className="hero min-h-[60vh]">
+    <div className="hero min-h-[70vh]">
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend className="fieldset-legend">Registration</legend>
 
@@ -146,7 +152,7 @@ export default function Registration() {
           <p className="validator-hint">Wrong password.</p>
         )}
 
-        <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={registrationPostRequest}>Register</button>
+        <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={userRegistration}>Register</button>
         {errorValue !== null && (
           Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
         )}
