@@ -1,20 +1,12 @@
 'use client'
 import { useAuth } from "context/AuthProvider";
-import { HEADERS, LOGOUT_ENDPOINT } from "lib/constants";
+import { HREF, LOGOUT_ENDPOINT, removeAccessToken } from "lib/constants";
+import { getHeaders } from "utils/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function Navbar() {
     const { authState } = useAuth();
-    // const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-    // useEffect(() => {
-    //     if (typeof window !== "undefined") {
-    //         const token = localStorage.getItem("accessToken");
-    //         setIsAuthenticated(!!token);
-    //     }
-    // }, []);
 
     return (
         <nav className="navbar shadow-sm px-60">
@@ -33,8 +25,8 @@ export default function Navbar() {
 function UnauthMenu() {
     return (
         <>
-            <Link href="/login" className="btn btn-ghost">Login</Link>
-            <Link href="/registration" className="btn btn-primary">Sign Up</Link>
+            <Link href={HREF.LOGIN_PAGE} className="btn btn-ghost">Login</Link>
+            <Link href={HREF.REGISTRATION_PAGE} className="btn btn-primary">Sign Up</Link>
         </>
     );
 }
@@ -47,36 +39,30 @@ function AuthMenu() {
 
     const logout = async () => {
         try {
-            const response = await fetch(
-                LOGOUT_ENDPOINT,
+            const response = await fetch(LOGOUT_ENDPOINT,
                 {
                     method: "POST",
-                    headers: new Headers({
-                        "Accept": 'application/json',
-                        "Content-Type": 'application/json',
-                        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
-                    }),
-                    credentials: "include",
+                    headers: getHeaders(),
+                    credentials: "include"
                 });
 
             const json = await response.json();
-            console.log("Response status:", response.status);
-            console.log("Json Response:", json);
+            console.log("Response:", json);
 
             if (!response.ok) {
                 console.error("Logout request failed:", response.status);
-                router.push("/error");
+                router.push(HREF.ERROR_PAGE);
                 return;
             }
-            localStorage.removeItem("accessToken");
+            removeAccessToken();
             localStorage.removeItem("user");
             // Reset global authentication
-            setAuthState({ user: null, isAuthenticated: false });
-            router.push('/login');
+            setAuthState({ isAuthenticated: false });
+            router.push(HREF.LOGIN_PAGE);
 
         } catch (error) {
             console.log('An error occurred:', error.message);
-            router.push('/error');
+            router.push(HREF.ERROR_PAGE);
         }
     };
 

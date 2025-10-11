@@ -2,11 +2,14 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { HEADERS, HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
+import { HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
+import { handleAuthData, authRequest } from "utils/auth";
+import { useAuth } from "context/AuthProvider";
 
 export default function Login() {
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
+  const { setAuthState } = useAuth();
 
   const [isFormTouched, setIsFormTouched] = useState({
     email: false,
@@ -39,27 +42,23 @@ export default function Login() {
     };
 
     try {
-      const response = await fetch(LOGIN_ENDPOINT, {
-        method: "POST",
-        headers: HEADERS,
-        body: JSON.stringify(requestBody),
-      });
+      const { response, json } = await authRequest(LOGIN_ENDPOINT, requestBody);
+      if (response.ok) {
+        setErrorValue(null);
+        // Save user and accessToken
+        handleAuthData(json);
+        setAuthState({ isAuthenticated: true });
 
-      const responseJson = await response.json();
-      console.log("Response status:", response.status);
-      console.log("Json Response:", responseJson);
-
-      if (!response.ok) {
-        setErrorValue(responseJson);
-        return;
+        router.push(HREF.PROFILE_PAGE);
       }
-
-      console.log("Response:", responseJson);
-      // router.push();
-
+      else if (response.status === STATUS.CONFLICT) {
+        setErrorValue(json.data);
+      } else {
+        router.push(HREF.ERROR_PAGE);
+      }
     } catch (error) {
       console.log('An error occurred:', error.message);
-      router.push('/error');
+      router.push(HREF.ERROR_PAGE);
     }
   };
 

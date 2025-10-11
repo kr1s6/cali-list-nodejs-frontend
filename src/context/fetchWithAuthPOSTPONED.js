@@ -1,7 +1,8 @@
-import { refreshAccessToken } from "./refreshAccessToken";
+import { getAccessToken, setAccessToken } from "utils/auth";
+import { refreshAccessToken } from "./refreshAccessTokenPOSTPONED";
 
 export async function fetchWithAuth(url, options = {}) {
-    let accessToken = localStorage.getItem("accessToken");
+    let accessToken = getAccessToken();
 
     const config = {
         ...options,
@@ -19,13 +20,13 @@ export async function fetchWithAuth(url, options = {}) {
         const newToken = await refreshAccessToken();
 
         if (newToken) {
-            localStorage.setItem("accessToken", newToken);
+            setAccessToken(newToken);
 
             config.headers.Authorization = `Bearer ${newToken}`;
             response = await fetch(url, config);
         } else {
             console.error("Session expired — please log in again.");
-            localStorage.removeItem("accessToken");
+            sessionStorage.removeItem("accessToken");
             router.push('/error');
         }
     }

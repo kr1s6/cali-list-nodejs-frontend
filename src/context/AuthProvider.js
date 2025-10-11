@@ -1,19 +1,16 @@
 'use client'
+import { getAccessToken } from "utils/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [authState, setAuthState] = useState({
-    user: null,
-    isAuthenticated: false
-  });
+  const [authState, setAuthState] = useState({isAuthenticated: false});
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (token && user) {
-      setAuthState({ user, isAuthenticated: true });
+    const accessToken = getAccessToken();
+    if (accessToken) {
+      setAuthState({isAuthenticated: true });
     }
   }, []);
 

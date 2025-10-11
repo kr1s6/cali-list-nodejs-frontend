@@ -1,4 +1,5 @@
-import { HEADERS, REFRESH_TOKEN_ENDPOINT } from "lib/constants";
+import { REFRESH_TOKEN_ENDPOINT } from "lib/constants";
+import { getHeaders } from "utils/auth";
 
 export async function refreshAccessToken() {
     try {
@@ -7,7 +8,7 @@ export async function refreshAccessToken() {
             {
                 method: "POST",
                 credentials: "include",
-                headers: HEADERS,
+                headers: getHeaders(),
             });
 
         const json = await response.json();
