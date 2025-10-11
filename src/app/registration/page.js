@@ -1,15 +1,15 @@
 'use client'
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { HEADERS, HREF, REGISTER_ENDPOINT, USER_CONSTANTS } from "lib/constants";
+import { HREF, REGISTER_ENDPOINT, STATUS, USER_CONSTANTS } from "lib/constants";
+import { handleAuthData, authRequest } from "utils/auth";
+import { useAuth } from "context/AuthProvider";
 
 export default function Registration() {
-
-  const [submitBtnIsDisabled, setSubmitBtnIsDisabled] = useState(true);
-  const [isBackendError, setIsBackendError] = useState(false);
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
+  const { setAuthState } = useAuth();
 
   const [isFormTouched, setIsFormTouched] = useState({
     username: false,
@@ -38,45 +38,39 @@ export default function Registration() {
   }
 
   const formIsValid = isValid.username && isValid.email && isValid.password && isValid.confirmPassword;
-  useEffect(() => {
-    setSubmitBtnIsDisabled(!formIsValid)
-  }, [formIsValid]);
+  const submitBtnIsDisabled = !formIsValid;
 
-  const registrationPostRequest = async () => {
+  const userRegistration = async () => {
     const requestBody = {
-      name: form.username,
+      username: form.username,
       email: form.email,
       password: form.password,
       confirmPassword: form.confirmPassword,
     };
+
     try {
-      const response = await fetch(REGISTER_ENDPOINT, {
-        method: "POST",
-        headers: HEADERS,
-        body: JSON.stringify(requestBody),
-      });
+      const { response, json } = await authRequest(REGISTER_ENDPOINT, requestBody);
+      if (response.ok) {
+        setErrorValue(null);
+        // Save user and accessToken
+        handleAuthData(json);
+        setAuthState({ isAuthenticated: true });
 
-      if (!response.ok) {
-        const error = await response.text();
-        setErrorValue(error);
-        setIsBackendError(true);
-        console.log(`Error ${response.status}: ${error}`);
-        return;
+        router.push(HREF.PROFILE_PAGE);
       }
-
-      setIsBackendError(false);
-      const successMessage = await response.text();
-      console.log("Response:", successMessage);
-      // router.push();
-
+      else if (response.status === STATUS.CONFLICT) {
+        setErrorValue(json.data);
+      } else {
+        router.push(HREF.ERROR_PAGE);
+      }
     } catch (error) {
       console.log('An error occurred:', error.message);
-      router.push('/error');
+      router.push(HREF.ERROR_PAGE);
     }
   };
 
   return (
-    <div className="hero min-h-[60vh]">
+    <div className="hero min-h-[70vh]">
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend className="fieldset-legend">Registration</legend>
 
@@ -147,9 +141,9 @@ export default function Registration() {
           <p className="validator-hint">Wrong password.</p>
         )}
 
-        <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={registrationPostRequest}>Register</button>
-        {isBackendError && (
-          <p className="validator-hint">{errorValue}</p>
+        <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={userRegistration}>Register</button>
+        {errorValue !== null && (
+          Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
         )}
 
         <div className="mt-2 w-full flex justify-end">

@@ -1,14 +1,15 @@
 'use client'
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { HEADERS, HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
+import { HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
+import { handleAuthData, authRequest } from "utils/auth";
+import { useAuth } from "context/AuthProvider";
 
 export default function Login() {
-  const [submitBtnIsDisabled, setSubmitBtnIsDisabled] = useState(true);
-  const [isBackendError, setIsBackendError] = useState(false);
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
+  const { setAuthState } = useAuth();
 
   const [isFormTouched, setIsFormTouched] = useState({
     email: false,
@@ -31,9 +32,7 @@ export default function Login() {
   }
 
   const formIsValid = isValid.email && isValid.password;
-  useEffect(() => {
-    setSubmitBtnIsDisabled(!formIsValid)
-  }, [formIsValid]);
+  const submitBtnIsDisabled = !formIsValid
 
 
   const loginPostRequest = async () => {
@@ -41,34 +40,30 @@ export default function Login() {
       email: form.email,
       password: form.password,
     };
+
     try {
-      const response = await fetch(LOGIN_ENDPOINT, {
-        method: "POST",
-        headers: HEADERS,
-        body: JSON.stringify(requestBody),
-      });
+      const { response, json } = await authRequest(LOGIN_ENDPOINT, requestBody);
+      if (response.ok) {
+        setErrorValue(null);
+        // Save user and accessToken
+        handleAuthData(json);
+        setAuthState({ isAuthenticated: true });
 
-      if (!response.ok) {
-        const error = await response.text();
-        setErrorValue(error);
-        setIsBackendError(true);
-        console.log(`Error ${response.status}: ${error}`);
-        return;
+        router.push(HREF.PROFILE_PAGE);
       }
-
-      setIsBackendError(false);
-      const successMessage = await response.text();
-      console.log("Response:", successMessage);
-      // router.push();
-
+      else if (response.status === STATUS.CONFLICT) {
+        setErrorValue(json.data);
+      } else {
+        router.push(HREF.ERROR_PAGE);
+      }
     } catch (error) {
       console.log('An error occurred:', error.message);
-      router.push('/error');
+      router.push(HREF.ERROR_PAGE);
     }
   };
 
   return (
-    <div className="hero min-h-[60vh]">
+    <div className="hero min-h-[70vh]">
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend className="fieldset-legend">Login</legend>
 
@@ -110,8 +105,8 @@ export default function Login() {
         </div>
 
         <button className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={loginPostRequest}>Login</button>
-        {isBackendError && (
-          <p className="validator-hint">{errorValue}</p>
+        {errorValue !== null && (
+          Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
         )}
 
         <div className="mt-2 w-full flex justify-end">
