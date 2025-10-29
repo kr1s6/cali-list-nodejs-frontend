@@ -21,13 +21,11 @@ export default function Login() {
     password: ""
   });
 
-  const passwordRef = useRef(null);
   const emailRef = useRef(null);
-
-  const isValid = useMemo(() => ({
+  const isValid = {
     email: emailRef.current?.checkValidity() ?? false,
-    password: passwordRef.current?.checkValidity() ?? false
-  }), [passwordRef, emailRef]);
+    password: form.password.length >= USER_CONSTANTS.PASSWORD_MIN_LENGTH,
+  };
 
   const formIsValid = useMemo(() => (isValid.email && isValid.password), [isValid]);
   const submitBtnIsDisabled = useMemo(() => (!formIsValid), [formIsValid]);
@@ -66,8 +64,7 @@ export default function Login() {
   }
 
   function handleOnBlur(e) {
-    const { name, value } = e.target;
-    setIsFormTouched(prev => ({ ...prev, [name]: value }));
+    setIsFormTouched(prev => ({ ...prev, [e.target.name]: true }));
   }
 
   return (
@@ -94,11 +91,11 @@ export default function Login() {
 
         <label htmlFor="passInput" className="label">Password</label>
         <input
-          ref={passwordRef}
           id="passInput"
           type="password"
           className="input"
           placeholder="Password"
+          minLength={USER_CONSTANTS.PASSWORD_MIN_LENGTH}
           maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
           required
           name="password"
@@ -107,7 +104,7 @@ export default function Login() {
           onBlur={handleOnBlur}
         />
         {isFormTouched.password && !isValid.password && (
-          <p className="validator-hint">Enter password.</p>
+          <p className="validator-hint">Min 8 characters.</p>
         )}
 
         <div>

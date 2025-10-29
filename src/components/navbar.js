@@ -1,6 +1,6 @@
 'use client'
 import { HREF, LOGOUT_ENDPOINT } from "lib/constants";
-import { getHeaders, removeAccessToken } from "utils/auth-utils";
+import { getHeaders, removeAccessToken, removeUserData } from "utils/auth-utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
@@ -49,14 +49,14 @@ function AuthMenu() {
 
             const json = await response.json();
             console.log("Response:", json);
+            removeAccessToken();
+            removeUserData();
 
             if (!response.ok) {
                 console.error("Logout request failed:", response.status);
                 router.push(HREF.ERROR_PAGE);
                 return;
             }
-            removeAccessToken();
-            localStorage.removeItem("user");
             // Reset global authentication
             dispatch({ type: "logout" });
             router.push(HREF.LOGIN_PAGE);

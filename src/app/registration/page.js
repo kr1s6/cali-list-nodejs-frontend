@@ -28,12 +28,12 @@ export default function Registration() {
   const usernameRef = useRef(null);
   const emailRef = useRef(null);
 
-  const isValid = useMemo(() => ({
+  const isValid = {
     username: usernameRef.current?.checkValidity() ?? false,
     email: emailRef.current?.checkValidity() ?? false,
-    password: form.password.length >= 8,
+    password: form.password.length >= USER_CONSTANTS.PASSWORD_MIN_LENGTH,
     confirmPassword: form.confirmPassword === form.password,
-  }), [usernameRef, emailRef, form]);
+  };
 
   const formIsValid = useMemo(() =>
     (isValid.username && isValid.email && isValid.password && isValid.confirmPassword), [isValid]);
@@ -75,8 +75,7 @@ export default function Registration() {
   }
 
   function handleOnBlur(e) {
-    const { name, value } = e.target;
-    setIsFormTouched(prev => ({ ...prev, [name]: value }));
+    setIsFormTouched(prev => ({ ...prev, [e.target.name]: true }));
   }
 
   return (

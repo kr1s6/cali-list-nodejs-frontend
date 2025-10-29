@@ -34,6 +34,10 @@ export function handleAuthData(json) {
     setAccessToken(json.accessToken);
 }
 
+export function removeUserData(){
+    localStorage.removeItem("user");
+}
+
 export function getAccessToken() {
     return sessionStorage.getItem("accessToken");
 }
@@ -45,3 +49,4 @@ export function setAccessToken(token) {
 export function removeAccessToken() {
     sessionStorage.removeItem("accessToken");
 }
+
