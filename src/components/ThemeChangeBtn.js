@@ -1,33 +1,17 @@
 'use client'
-import { useEffect, useState } from "react";
+import { ThemeContext, themes } from "context/ThemeProvider";
+import { useContext } from "react";
 
 export default function ThemeChangeBtn() {
-    const themes = {
-        light: "Light",
-        dark: "Dark"
-    };
-    const [theme, setTheme] = useState(null);
-
-    useEffect(() => {
-        const localStorageTheme = localStorage.getItem("theme");
-        const initialTheme = localStorageTheme === null ? themes.light : JSON.parse(localStorageTheme);
-        setTheme(initialTheme);
-    }, []);
-
-    useEffect(() => {
-        if (theme !== null) {
-            localStorage.setItem("theme", JSON.stringify(theme));
-        }
-    }, [theme]);
-
-    const handleChange = () => {
-        const newTheme = theme === themes.light ? themes.dark : themes.light;
-        setTheme(newTheme);
-    };
+    const { state, dispatch } = useContext(ThemeContext);
 
     // Prevents loading of unfinished component
-    if (theme === null) {
+    if (state.theme === null) {
         return null;
+    }
+
+    const handleChange = () => {
+        dispatch({ type: "changeTheme" });
     }
 
     return (
@@ -47,7 +31,7 @@ export default function ThemeChangeBtn() {
                 aria-label="Theme switch"
                 className="toggle theme-controller"
                 onChange={handleChange}
-                checked={theme === themes.dark ? true : false} />
+                checked={state.theme === themes.dark ? true : false} />
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 aria-label="Dark theme"

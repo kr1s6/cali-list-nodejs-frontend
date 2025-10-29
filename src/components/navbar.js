@@ -1,12 +1,13 @@
 'use client'
-import { useAuth } from "context/AuthProvider";
-import { HREF, LOGOUT_ENDPOINT, removeAccessToken } from "lib/constants";
-import { getHeaders } from "utils/auth";
+import { HREF, LOGOUT_ENDPOINT } from "lib/constants";
+import { getHeaders, removeAccessToken } from "utils/auth-utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { AuthContext } from "context/AuthProvider";
 
 export default function Navbar() {
-    const { authState } = useAuth();
+    const { state } = useContext(AuthContext);
 
     return (
         <nav className="navbar shadow-sm px-60">
@@ -15,7 +16,7 @@ export default function Navbar() {
             </div>
 
             <div className="flex-none">
-                {authState.isAuthenticated ? <AuthMenu /> : <UnauthMenu />}
+                {state.isAuthenticated ? <AuthMenu /> : <UnauthMenu />}
             </div>
         </nav>
     );
@@ -35,7 +36,7 @@ function UnauthMenu() {
 
 function AuthMenu() {
     const router = useRouter();
-    const { setAuthState } = useAuth();
+    const { dispatch } = useContext(AuthContext);
 
     const logout = async () => {
         try {
@@ -57,7 +58,7 @@ function AuthMenu() {
             removeAccessToken();
             localStorage.removeItem("user");
             // Reset global authentication
-            setAuthState({ isAuthenticated: false });
+            dispatch({ type: "logout" });
             router.push(HREF.LOGIN_PAGE);
 
         } catch (error) {

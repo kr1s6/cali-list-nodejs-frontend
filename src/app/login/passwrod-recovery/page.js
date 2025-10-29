@@ -14,13 +14,11 @@ export default function Login() {
     email: "",
   });
 
-  const refs = {
-    email: useRef(null),
-  };
+  const emailRef = useRef(null);
 
-  const isValid = {
-    email: refs.email.current?.checkValidity() ?? false,
-  }
+  const isValid = useMemo(() => ({
+    email: emailRef.current?.checkValidity() ?? false,
+  }), [emailRef]);
 
   useEffect(() => {
     setSubmitBtnIsDisabled(!isValid.email)
@@ -33,7 +31,7 @@ export default function Login() {
 
         <label htmlFor="emailInput" className="label">Email</label>
         <input
-          ref={refs.email}
+          ref={emailRef}
           id="emailInput"
           type="email"
           className="input"

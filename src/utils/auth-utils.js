@@ -1,4 +1,5 @@
 export const getHeaders = () => {
+    console.log("----------getHeaders-START----------");
     const token = getAccessToken();
     const headers = {
         'Accept': 'application/json',
@@ -7,6 +8,7 @@ export const getHeaders = () => {
     if (token) {
         headers["Authorization"] = `Bearer ${token}`;
     }
+    console.log("----------getHeaders-END----------");
     return new Headers(headers);
 }
 

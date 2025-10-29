@@ -1,15 +1,15 @@
 'use client'
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { HREF, REGISTER_ENDPOINT, STATUS, USER_CONSTANTS } from "lib/constants";
-import { handleAuthData, authRequest } from "utils/auth";
-import { useAuth } from "context/AuthProvider";
+import { handleAuthData, authRequest } from "utils/auth-utils";
+import { AuthContext } from "context/AuthProvider";
 
 export default function Registration() {
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
-  const { setAuthState } = useAuth();
+  const { dispatch } = useContext(AuthContext);
 
   const [isFormTouched, setIsFormTouched] = useState({
     username: false,
@@ -25,22 +25,23 @@ export default function Registration() {
     confirmPassword: "",
   });
 
-  const refs = {
-    username: useRef(null),
-    email: useRef(null),
-  };
+  const usernameRef = useRef(null);
+  const emailRef = useRef(null);
 
-  const isValid = {
-    username: refs.username.current?.checkValidity() ?? false,
-    email: refs.email.current?.checkValidity() ?? false,
+  const isValid = useMemo(() => ({
+    username: usernameRef.current?.checkValidity() ?? false,
+    email: emailRef.current?.checkValidity() ?? false,
     password: form.password.length >= 8,
     confirmPassword: form.confirmPassword === form.password,
-  }
+  }), [usernameRef, emailRef, form]);
 
-  const formIsValid = isValid.username && isValid.email && isValid.password && isValid.confirmPassword;
-  const submitBtnIsDisabled = !formIsValid;
+  const formIsValid = useMemo(() =>
+    (isValid.username && isValid.email && isValid.password && isValid.confirmPassword), [isValid]);
+
+  const submitBtnIsDisabled = useMemo(() => (!formIsValid), [formIsValid]);
 
   const userRegistration = async () => {
+    console.log("-----SEND Register Request-----");
     const requestBody = {
       username: form.username,
       email: form.email,
@@ -54,8 +55,7 @@ export default function Registration() {
         setErrorValue(null);
         // Save user and accessToken
         handleAuthData(json);
-        setAuthState({ isAuthenticated: true });
-
+        dispatch({ type: "login" });
         router.push(HREF.PROFILE_PAGE);
       }
       else if (response.status === STATUS.CONFLICT) {
@@ -69,6 +69,16 @@ export default function Registration() {
     }
   };
 
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  }
+
+  function handleOnBlur(e) {
+    const { name, value } = e.target;
+    setIsFormTouched(prev => ({ ...prev, [name]: value }));
+  }
+
   return (
     <div className="hero min-h-[70vh]">
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
@@ -76,16 +86,17 @@ export default function Registration() {
 
         <label htmlFor="usernameInput" className="label">Username</label>
         <input
-          ref={refs.username}
+          ref={usernameRef}
           id="usernameInput"
           type="text"
           className="input"
           placeholder="Username"
           maxLength={USER_CONSTANTS.USERNAME_MAX_LENGTH}
           required
+          name="username"
           value={form.username}
-          onChange={e => setForm({ ...form, username: e.target.value })}
-          onBlur={() => setIsFormTouched({ ...isFormTouched, username: true })}
+          onChange={handleChange}
+          onBlur={handleOnBlur}
         />
         {isFormTouched.username && !isValid.username && (
           <p className="validator-hint">Enter unique username.</p>
@@ -93,15 +104,16 @@ export default function Registration() {
 
         <label htmlFor="emailInput" className="label">Email</label>
         <input
-          ref={refs.email}
+          ref={emailRef}
           id="emailInput"
           type="email"
           className="input"
           placeholder="Email"
           required
+          name="email"
           value={form.email}
-          onChange={e => setForm({ ...form, email: e.target.value })}
-          onBlur={() => setIsFormTouched({ ...isFormTouched, email: true })}
+          onChange={handleChange}
+          onBlur={handleOnBlur}
         />
         {isFormTouched.email && !isValid.email && (
           <p className="validator-hint">Enter email address.</p>
@@ -116,9 +128,10 @@ export default function Registration() {
           minLength={USER_CONSTANTS.PASSWORD_MIN_LENGTH}
           maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
           required
+          name="password"
           value={form.password}
-          onChange={e => setForm({ ...form, password: e.target.value })}
-          onBlur={() => setIsFormTouched({ ...isFormTouched, password: true })}
+          onChange={handleChange}
+          onBlur={handleOnBlur}
         />
         {isFormTouched.password && !isValid.password && (
           <p className="validator-hint">Minimum 8 characters.</p>
@@ -133,9 +146,10 @@ export default function Registration() {
           minLength={USER_CONSTANTS.PASSWORD_MIN_LENGTH}
           maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
           required
+          name="confirmPassword"
           value={form.confirmPassword}
-          onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
-          onBlur={() => setIsFormTouched({ ...isFormTouched, confirmPassword: true })}
+          onChange={handleChange}
+          onBlur={handleOnBlur}
         />
         {isFormTouched.confirmPassword && !isValid.confirmPassword && (
           <p className="validator-hint">Wrong password.</p>

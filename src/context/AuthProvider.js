@@ -1,24 +1,34 @@
 'use client'
-import { getAccessToken } from "utils/auth";
-import { createContext, useContext, useEffect, useState } from "react";
+import { getAccessToken } from "utils/auth-utils";
+import { createContext, useEffect, useReducer } from "react";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
+
+const reducer = (state, action) => {
+  console.log("Reducer");
+  switch (action.type) {
+    case "login":
+      return { ...state, isAuthenticated: true };
+    case "logout":
+      return { ...state, isAuthenticated: false };
+    case "setAuth":
+      return {...state, isAuthenticated: action.payload};
+    default:
+      return state;
+  }
+};
 
 export function AuthProvider({ children }) {
-  const [authState, setAuthState] = useState({isAuthenticated: false});
+  const [state, dispatch] = useReducer(reducer, { isAuthenticated: false });
 
   useEffect(() => {
     const accessToken = getAccessToken();
-    if (accessToken) {
-      setAuthState({isAuthenticated: true });
-    }
+    dispatch({ type: "setAuth", payload: !!accessToken });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ authState, setAuthState }}>
+    <AuthContext.Provider value={{ state, dispatch }}>
       {children}
     </AuthContext.Provider>
   );
 }
-
-export const useAuth = () => useContext(AuthContext);

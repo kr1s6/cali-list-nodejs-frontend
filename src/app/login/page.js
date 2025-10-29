@@ -1,15 +1,15 @@
 'use client'
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
-import { handleAuthData, authRequest } from "utils/auth";
-import { useAuth } from "context/AuthProvider";
+import { handleAuthData, authRequest } from "utils/auth-utils";
+import { AuthContext } from "context/AuthProvider";
 
 export default function Login() {
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
-  const { setAuthState } = useAuth();
+  const { dispatch } = useContext(AuthContext);
 
   const [isFormTouched, setIsFormTouched] = useState({
     email: false,
@@ -21,21 +21,20 @@ export default function Login() {
     password: ""
   });
 
-  const refs = {
-    password: useRef(null),
-    email: useRef(null),
-  };
+  const passwordRef = useRef(null);
+  const emailRef = useRef(null);
 
-  const isValid = {
-    email: refs.email.current?.checkValidity() ?? false,
-    password: refs.password.current?.checkValidity() ?? false
-  }
+  const isValid = useMemo(() => ({
+    email: emailRef.current?.checkValidity() ?? false,
+    password: passwordRef.current?.checkValidity() ?? false
+  }), [passwordRef, emailRef]);
 
-  const formIsValid = isValid.email && isValid.password;
-  const submitBtnIsDisabled = !formIsValid
+  const formIsValid = useMemo(() => (isValid.email && isValid.password), [isValid]);
+  const submitBtnIsDisabled = useMemo(() => (!formIsValid), [formIsValid]);
 
 
   const loginPostRequest = async () => {
+    console.log("-----SEND login Request-----");
     const requestBody = {
       email: form.email,
       password: form.password,
@@ -47,8 +46,7 @@ export default function Login() {
         setErrorValue(null);
         // Save user and accessToken
         handleAuthData(json);
-        setAuthState({ isAuthenticated: true });
-
+        dispatch({ type: "login" });
         router.push(HREF.PROFILE_PAGE);
       }
       else if (response.status === STATUS.CONFLICT) {
@@ -62,6 +60,16 @@ export default function Login() {
     }
   };
 
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  }
+
+  function handleOnBlur(e) {
+    const { name, value } = e.target;
+    setIsFormTouched(prev => ({ ...prev, [name]: value }));
+  }
+
   return (
     <div className="hero min-h-[70vh]">
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
@@ -69,15 +77,16 @@ export default function Login() {
 
         <label htmlFor="emailInput" className="label">Email</label>
         <input
-          ref={refs.email}
+          ref={emailRef}
           id="emailInput"
           type="email"
           className="input"
           placeholder="Email"
           required
+          name="email"
           value={form.email}
-          onChange={e => setForm({ ...form, email: e.target.value })}
-          onBlur={() => setIsFormTouched({ ...isFormTouched, email: true })}
+          onChange={handleChange}
+          onBlur={handleOnBlur}
         />
         {isFormTouched.email && !isValid.email && (
           <p className="validator-hint">Enter email address.</p>
@@ -85,16 +94,17 @@ export default function Login() {
 
         <label htmlFor="passInput" className="label">Password</label>
         <input
-          ref={refs.password}
+          ref={passwordRef}
           id="passInput"
           type="password"
           className="input"
           placeholder="Password"
           maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
           required
+          name="password"
           value={form.password}
-          onChange={e => setForm({ ...form, password: e.target.value })}
-          onBlur={() => setIsFormTouched({ ...isFormTouched, password: true })}
+          onChange={handleChange}
+          onBlur={handleOnBlur}
         />
         {isFormTouched.password && !isValid.password && (
           <p className="validator-hint">Enter password.</p>
