@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useContext, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { HREF, REGISTER_ENDPOINT, STATUS, USER_CONSTANTS } from "lib/constants";
-import { handleAuthData, authRequest } from "utils/auth-utils";
+import { handleAuthData, postRequest } from "utils/auth-utils";
 import { AuthContext } from "context/AuthProvider";
 
 export default function Registration() {
@@ -41,7 +41,7 @@ export default function Registration() {
   const submitBtnIsDisabled = useMemo(() => (!formIsValid), [formIsValid]);
 
   const userRegistration = async () => {
-    console.log("-----SEND Register Request-----");
+    console.log("Register request.");
     const requestBody = {
       username: form.username,
       email: form.email,
@@ -50,10 +50,9 @@ export default function Registration() {
     };
 
     try {
-      const { response, json } = await authRequest(REGISTER_ENDPOINT, requestBody);
+      const { response, json } = await postRequest(REGISTER_ENDPOINT, requestBody);
       if (response.ok) {
         setErrorValue(null);
-        // Save user and accessToken
         handleAuthData(json);
         dispatch({ type: "login" });
         router.push(HREF.PROFILE_PAGE);

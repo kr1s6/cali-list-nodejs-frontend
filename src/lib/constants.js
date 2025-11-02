@@ -10,6 +10,7 @@ export const USER_CONSTANTS = {
 };
 
 export const HREF = {
+    MAIN_PAGE: "/",
     LOGIN_PAGE: "/login",
     REGISTRATION_PAGE: "/registration",
     PASSWORD_RECOVERY_PAGE: "/login/passwrod-recovery",

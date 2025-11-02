@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useContext, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
-import { handleAuthData, authRequest } from "utils/auth-utils";
+import { handleAuthData, postRequest } from "utils/auth-utils";
 import { AuthContext } from "context/AuthProvider";
 
 export default function Login() {
@@ -32,14 +32,14 @@ export default function Login() {
 
 
   const loginPostRequest = async () => {
-    console.log("-----SEND login Request-----");
+    console.log("Login request.");
     const requestBody = {
       email: form.email,
       password: form.password,
     };
 
     try {
-      const { response, json } = await authRequest(LOGIN_ENDPOINT, requestBody);
+      const { response, json } = await postRequest(LOGIN_ENDPOINT, requestBody);
       if (response.ok) {
         setErrorValue(null);
         // Save user and accessToken
@@ -58,12 +58,12 @@ export default function Login() {
     }
   };
 
-  function handleChange(e) {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   }
 
-  function handleOnBlur(e) {
+  const handleOnBlur = (e) => {
     setIsFormTouched(prev => ({ ...prev, [e.target.name]: true }));
   }
 

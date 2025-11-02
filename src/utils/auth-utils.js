@@ -1,5 +1,7 @@
+'use client'
+import { HREF, LOGOUT_ENDPOINT, REFRESH_TOKEN_ENDPOINT } from "lib/constants";
+
 export const getHeaders = () => {
-    console.log("----------getHeaders-START----------");
     const token = getAccessToken();
     const headers = {
         'Accept': 'application/json',
@@ -8,18 +10,16 @@ export const getHeaders = () => {
     if (token) {
         headers["Authorization"] = `Bearer ${token}`;
     }
-    console.log("----------getHeaders-END----------");
     return new Headers(headers);
 }
 
-export async function authRequest(endpoint, requestBody) {
+export async function postRequest(endpoint, requestBody = null) {
     console.log("endpoint:" + endpoint);
-    
     const response = await fetch(endpoint, {
         method: "POST",
         headers: getHeaders(),
-        body: JSON.stringify(requestBody),
-        credentials: "include"
+        body: requestBody ? JSON.stringify(requestBody) : null,
+        credentials: "include",
     });
 
     const json = await response.json();
@@ -29,24 +29,69 @@ export async function authRequest(endpoint, requestBody) {
     return { response, json };
 }
 
+export async function refreshTokenRequest(accessToken) {
+    console.log("Refresh token request.");
+    const requestBody = {
+        token: accessToken,
+    };
+    const { response, json } = await postRequest(REFRESH_TOKEN_ENDPOINT, requestBody);
+    if (response.ok) {
+        setAccessToken(json.accessToken);
+        console.log("Refresh token response: OK - ", json.accessToken);
+        return (true);
+    } else {
+        console.log("RefreshToken - Response Failed!");
+        // logout(router, dispatch);
+        return (false);
+    }
+}
+
+export async function logout(router, dispatch) {
+    console.log("Logout request.");
+    try {
+        const { response } = await postRequest(LOGOUT_ENDPOINT);
+        removeAccessToken();
+        removeUserData();
+
+        if (response.ok) {
+            console.log("PUSH HOME PAGE");
+            router.push(HREF.MAIN_PAGE);
+        } else {
+            console.error("Logout request failed:", response.status);
+            router.push(HREF.ERROR_PAGE);
+        }
+    } catch (error) {
+        console.log('An error occurred:', error.message);
+        router.push(HREF.ERROR_PAGE);
+    }
+
+    dispatch({ type: "logout" });
+};
+
 export function handleAuthData(json) {
     localStorage.setItem("user", JSON.stringify(json.data));
     setAccessToken(json.accessToken);
 }
 
-export function removeUserData(){
+export function removeUserData() {
+    console.log("remove user");
     localStorage.removeItem("user");
 }
 
 export function getAccessToken() {
-    return sessionStorage.getItem("accessToken");
+    if (typeof window !== "undefined") {
+        return sessionStorage.getItem("accessToken");
+    }
+    return null;
 }
 
 export function setAccessToken(token) {
+    console.log("Set access token");
     sessionStorage.setItem("accessToken", token)
 }
 
 export function removeAccessToken() {
+    console.log("remove access token");
     sessionStorage.removeItem("accessToken");
 }
 
