@@ -22,6 +22,16 @@ export default function Navbar() {
     );
 }
 
+export function LoadingNavabar() {
+    return (
+        <nav className="navbar shadow-sm px-60">
+            <div className="flex-1">
+                <p className="btn btn-ghost text-xl">Calisthenics Hub</p>
+            </div>
+        </nav>
+    );
+}
+
 /* -------------------- MENU FOR NOT AUTHENTICATED -------------------- */
 function UnauthMenu() {
     return (

@@ -47,10 +47,8 @@ export default function Login() {
         dispatch({ type: "login" });
         router.push(HREF.PROFILE_PAGE);
       }
-      else if (response.status === STATUS.CONFLICT) {
+      else {
         setErrorValue(json.data);
-      } else {
-        router.push(HREF.ERROR_PAGE);
       }
     } catch (error) {
       console.log('An error occurred:', error.message);
@@ -112,9 +110,7 @@ export default function Login() {
         </div>
 
         <button className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={loginPostRequest}>Login</button>
-        {errorValue !== null && (
-          Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
-        )}
+        {errorValue !== null && (<p className="validator-hint">{errorValue}</p>)}
 
         <div className="mt-2 w-full flex justify-end">
           <Link href={HREF.REGISTRATION_PAGE} className="link link-hover">Create new account</Link>
