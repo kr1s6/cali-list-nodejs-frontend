@@ -1,20 +1,20 @@
 'use client'
-import { useAuth } from 'context/AuthProvider';
+import { AuthContext } from 'context/AuthProvider';
 import { HREF } from 'lib/constants';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 
 export default function Profile() {
   const router = useRouter();
-  const { authState } = useAuth();
+  const { state } = useContext(AuthContext);
 
   useEffect(() => {
-    if (!authState.isAuthenticated) {
+    if (!state.isAuthenticated) {
       router.push(HREF.LOGIN_PAGE);
     }
-  }, [authState.isAuthenticated, router]);
+  }, [state.isAuthenticated, router]);
 
-  if (!authState.isAuthenticated) return null;
+  if (!state.isAuthenticated) return null;
 
   return (
     <>

@@ -1,12 +1,13 @@
 'use client'
-import { useAuth } from "context/AuthProvider";
-import { HREF, LOGOUT_ENDPOINT, removeAccessToken } from "lib/constants";
-import { getHeaders } from "utils/auth";
+import { HREF } from "lib/constants";
+import { logout } from "utils/auth-utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { AuthContext } from "context/AuthProvider";
 
 export default function Navbar() {
-    const { authState } = useAuth();
+    const { state } = useContext(AuthContext);
 
     return (
         <nav className="navbar shadow-sm px-60">
@@ -15,7 +16,17 @@ export default function Navbar() {
             </div>
 
             <div className="flex-none">
-                {authState.isAuthenticated ? <AuthMenu /> : <UnauthMenu />}
+                {state.isAuthenticated ? <AuthMenu /> : <UnauthMenu />}
+            </div>
+        </nav>
+    );
+}
+
+export function LoadingNavabar() {
+    return (
+        <nav className="navbar shadow-sm px-60">
+            <div className="flex-1">
+                <p className="btn btn-ghost text-xl">Calisthenics Hub</p>
             </div>
         </nav>
     );
@@ -35,35 +46,10 @@ function UnauthMenu() {
 
 function AuthMenu() {
     const router = useRouter();
-    const { setAuthState } = useAuth();
+    const { dispatch } = useContext(AuthContext);
 
-    const logout = async () => {
-        try {
-            const response = await fetch(LOGOUT_ENDPOINT,
-                {
-                    method: "POST",
-                    headers: getHeaders(),
-                    credentials: "include"
-                });
-
-            const json = await response.json();
-            console.log("Response:", json);
-
-            if (!response.ok) {
-                console.error("Logout request failed:", response.status);
-                router.push(HREF.ERROR_PAGE);
-                return;
-            }
-            removeAccessToken();
-            localStorage.removeItem("user");
-            // Reset global authentication
-            setAuthState({ isAuthenticated: false });
-            router.push(HREF.LOGIN_PAGE);
-
-        } catch (error) {
-            console.log('An error occurred:', error.message);
-            router.push(HREF.ERROR_PAGE);
-        }
+    const handleLogout = async () => {
+        logout(router, dispatch);
     };
 
     return (
@@ -90,7 +76,7 @@ function AuthMenu() {
                     </Link>
                 </li>
                 <li>
-                    <button id="logoutBtn" onClick={logout}>
+                    <button id="logoutBtn" onClick={handleLogout}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
                             <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm5.03 4.72a.75.75 0 0 1 0 1.06l-1.72 1.72h10.94a.75.75 0 0 1 0 1.5H10.81l1.72 1.72a.75.75 0 1 1-1.06 1.06l-3-3a.75.75 0 0 1 0-1.06l3-3a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
                         </svg>

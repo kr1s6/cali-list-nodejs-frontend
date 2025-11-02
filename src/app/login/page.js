@@ -1,15 +1,15 @@
 'use client'
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
-import { handleAuthData, authRequest } from "utils/auth";
-import { useAuth } from "context/AuthProvider";
+import { handleAuthData, postRequest } from "utils/auth-utils";
+import { AuthContext } from "context/AuthProvider";
 
 export default function Login() {
   const [errorValue, setErrorValue] = useState(null);
   const router = useRouter();
-  const { setAuthState } = useAuth();
+  const { dispatch } = useContext(AuthContext);
 
   const [isFormTouched, setIsFormTouched] = useState({
     email: false,
@@ -21,46 +21,49 @@ export default function Login() {
     password: ""
   });
 
-  const refs = {
-    password: useRef(null),
-    email: useRef(null),
+  const emailRef = useRef(null);
+  const isValid = {
+    email: emailRef.current?.checkValidity() ?? false,
+    password: form.password.length >= USER_CONSTANTS.PASSWORD_MIN_LENGTH,
   };
 
-  const isValid = {
-    email: refs.email.current?.checkValidity() ?? false,
-    password: refs.password.current?.checkValidity() ?? false
-  }
-
-  const formIsValid = isValid.email && isValid.password;
-  const submitBtnIsDisabled = !formIsValid
+  const formIsValid = useMemo(() => (isValid.email && isValid.password), [isValid]);
+  const submitBtnIsDisabled = useMemo(() => (!formIsValid), [formIsValid]);
 
 
   const loginPostRequest = async () => {
+    console.log("Login request.");
     const requestBody = {
       email: form.email,
       password: form.password,
     };
 
     try {
-      const { response, json } = await authRequest(LOGIN_ENDPOINT, requestBody);
+      const { response, json } = await postRequest(LOGIN_ENDPOINT, requestBody);
       if (response.ok) {
         setErrorValue(null);
         // Save user and accessToken
         handleAuthData(json);
-        setAuthState({ isAuthenticated: true });
-
+        dispatch({ type: "login" });
         router.push(HREF.PROFILE_PAGE);
       }
-      else if (response.status === STATUS.CONFLICT) {
+      else {
         setErrorValue(json.data);
-      } else {
-        router.push(HREF.ERROR_PAGE);
       }
     } catch (error) {
       console.log('An error occurred:', error.message);
       router.push(HREF.ERROR_PAGE);
     }
   };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  }
+
+  const handleOnBlur = (e) => {
+    setIsFormTouched(prev => ({ ...prev, [e.target.name]: true }));
+  }
 
   return (
     <div className="hero min-h-[70vh]">
@@ -69,15 +72,16 @@ export default function Login() {
 
         <label htmlFor="emailInput" className="label">Email</label>
         <input
-          ref={refs.email}
+          ref={emailRef}
           id="emailInput"
           type="email"
           className="input"
           placeholder="Email"
           required
+          name="email"
           value={form.email}
-          onChange={e => setForm({ ...form, email: e.target.value })}
-          onBlur={() => setIsFormTouched({ ...isFormTouched, email: true })}
+          onChange={handleChange}
+          onBlur={handleOnBlur}
         />
         {isFormTouched.email && !isValid.email && (
           <p className="validator-hint">Enter email address.</p>
@@ -85,19 +89,20 @@ export default function Login() {
 
         <label htmlFor="passInput" className="label">Password</label>
         <input
-          ref={refs.password}
           id="passInput"
           type="password"
           className="input"
           placeholder="Password"
+          minLength={USER_CONSTANTS.PASSWORD_MIN_LENGTH}
           maxLength={USER_CONSTANTS.PASSWORD_MAX_LENGTH}
           required
+          name="password"
           value={form.password}
-          onChange={e => setForm({ ...form, password: e.target.value })}
-          onBlur={() => setIsFormTouched({ ...isFormTouched, password: true })}
+          onChange={handleChange}
+          onBlur={handleOnBlur}
         />
         {isFormTouched.password && !isValid.password && (
-          <p className="validator-hint">Enter password.</p>
+          <p className="validator-hint">Min 8 characters.</p>
         )}
 
         <div>
@@ -105,9 +110,7 @@ export default function Login() {
         </div>
 
         <button className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={loginPostRequest}>Login</button>
-        {errorValue !== null && (
-          Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
-        )}
+        {errorValue !== null && (<p className="validator-hint">{errorValue}</p>)}
 
         <div className="mt-2 w-full flex justify-end">
           <Link href={HREF.REGISTRATION_PAGE} className="link link-hover">Create new account</Link>
