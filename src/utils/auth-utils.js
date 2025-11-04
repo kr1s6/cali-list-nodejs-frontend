@@ -37,11 +37,10 @@ export async function refreshTokenRequest(accessToken) {
     const { response, json } = await postRequest(REFRESH_TOKEN_ENDPOINT, requestBody);
     if (response.ok) {
         setAccessToken(json.accessToken);
-        console.log("Refresh token response: OK - ", json.accessToken);
+        console.log("RefreshToken - Response OK!");
         return (true);
     } else {
         console.log("RefreshToken - Response Failed!");
-        // logout(router, dispatch);
         return (false);
     }
 }
