@@ -78,7 +78,6 @@ export function AuthProvider({ children }) {
         <LoadingNavabar></LoadingNavabar>
         <Footer></Footer>
       </>
-
     );
   }
 
