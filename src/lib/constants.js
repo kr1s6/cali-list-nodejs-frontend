@@ -2,6 +2,7 @@ export const REGISTER_ENDPOINT = "http://localhost:8080/api/register";
 export const LOGIN_ENDPOINT = "http://localhost:8080/api/login";
 export const LOGOUT_ENDPOINT = "http://localhost:8080/api/logout";
 export const REFRESH_TOKEN_ENDPOINT = "http://localhost:8080/api/refreshToken";
+export const RECOVERY_PASSWORDD_REQUEST_ENDPOINT = "http://localhost:8080/api/password-recovery"
 
 export const USER_CONSTANTS = {
     USERNAME_MAX_LENGTH: 30,
@@ -14,6 +15,8 @@ export const HREF = {
     LOGIN_PAGE: "/login",
     REGISTRATION_PAGE: "/registration",
     PASSWORD_RECOVERY_PAGE: "/login/passwrod-recovery",
+    PASSWORD_RECOVERY_SEND_PAGE: "/login/passwrod-recovery/check-email",
+    PASSWORD_RECOVERY_SUCCESS_PAGE: "/login/passwrod-recovery/password-changed",
     PROFILE_PAGE: "/profile",
     ERROR_PAGE: "/error",
 }
