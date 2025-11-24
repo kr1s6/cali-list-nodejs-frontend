@@ -1,10 +1,13 @@
 'use client'
-import { useEffect, useMemo, useRef, useState } from "react";
+import { HREF, RECOVERY_PASSWORDD_REQUEST_ENDPOINT, STATUS } from "lib/constants";
+import { useRouter } from "next/navigation";
+import { useMemo, useRef, useState } from "react";
+import { handleAuthData, postRequest } from "utils/auth-utils";
 
-export default function Login() {
-  const [submitBtnIsDisabled, setSubmitBtnIsDisabled] = useState(true);
-  const [isBackendError, setIsBackendError] = useState(false);
+export default function SendPasswordRecovery() {
+  const [isBackendError, setBackendError] = useState(false);
   const [errorValue, setErrorValue] = useState(null);
+  const router = useRouter();
 
   const [isFormTouched, setIsFormTouched] = useState({
     email: false,
@@ -16,13 +19,37 @@ export default function Login() {
 
   const emailRef = useRef(null);
 
-  const isValid = useMemo(() => ({
+  const isValid = {
     email: emailRef.current?.checkValidity() ?? false,
-  }), [emailRef]);
+  };
 
-  useEffect(() => {
-    setSubmitBtnIsDisabled(!isValid.email)
-  }, [isValid.email]);
+  const formIsValid = useMemo(() => (isValid.email), [isValid]);
+
+  const submitBtnIsDisabled = useMemo(() => (!formIsValid), [formIsValid]);
+
+  const sendPasswordRecoveryEmail = async () => {
+    console.log("Password recovery request.");
+    const requestBody = {
+      email: form.email,
+    };
+
+    try {
+      const { response, json } = await postRequest(RECOVERY_PASSWORDD_REQUEST_ENDPOINT, requestBody);
+      if (response.ok) {
+        setBackendError(null);
+        handleAuthData(json);
+        router.push(HREF.PASSWORD_RECOVERY_SEND_PAGE);
+      }
+      else if (response.status === STATUS.INTERNAL_SERVER_ERROR) {
+        setErrorValue(json.data);
+      } else {
+        router.push(HREF.ERROR_PAGE);
+      }
+    } catch (error) {
+      console.log('An error occurred:', error.message);
+      router.push(HREF.ERROR_PAGE);
+    }
+  };
 
   return (
     <div className="hero min-h-[60vh]">
@@ -45,7 +72,7 @@ export default function Login() {
           <p className="validator-hint">Enter email address.</p>
         )}
 
-        <button className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled}>Send email</button>
+        <button className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={sendPasswordRecoveryEmail}>Send email</button>
         {isBackendError && (
           <p className="validator-hint">{errorValue}</p>
         )}

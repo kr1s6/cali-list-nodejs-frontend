@@ -7,7 +7,7 @@ import { handleAuthData, postRequest } from "utils/auth-utils";
 import { AuthContext } from "context/AuthProvider";
 
 export default function Registration() {
-  const [errorValue, setErrorValue] = useState(null);
+  const [isBackendError, setBackendError] = useState(null);
   const router = useRouter();
   const { dispatch } = useContext(AuthContext);
 
@@ -52,13 +52,13 @@ export default function Registration() {
     try {
       const { response, json } = await postRequest(REGISTER_ENDPOINT, requestBody);
       if (response.ok) {
-        setErrorValue(null);
+        setBackendError(null);
         handleAuthData(json);
         dispatch({ type: "login" });
         router.push(HREF.PROFILE_PAGE);
       }
       else if (response.status === STATUS.CONFLICT) {
-        setErrorValue(json.data);
+        setBackendError(json.data);
       } else {
         router.push(HREF.ERROR_PAGE);
       }
@@ -154,8 +154,8 @@ export default function Registration() {
         )}
 
         <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={userRegistration}>Register</button>
-        {errorValue !== null && (
-          Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
+        {isBackendError !== null && (
+          Object.values(isBackendError).map(error => <p className="validator-hint">{error}</p>)
         )}
 
         <div className="mt-2 w-full flex justify-end">
