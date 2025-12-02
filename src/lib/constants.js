@@ -3,6 +3,8 @@ export const LOGIN_ENDPOINT = "http://localhost:8080/api/login";
 export const LOGOUT_ENDPOINT = "http://localhost:8080/api/logout";
 export const REFRESH_TOKEN_ENDPOINT = "http://localhost:8080/api/refreshToken";
 export const RECOVERY_PASSWORDD_REQUEST_ENDPOINT = "http://localhost:8080/api/password-recovery"
+export const SET_USER_BIRTHDATE_ENDPOINT = "http://localhost:8080/api/set-user-birthdate"
+export const SET_USER_CALI_START_DATE_ENDPOINT = "http://localhost:8080/api/set-user-cali-start-date"
 
 export const USER_CONSTANTS = {
     USERNAME_MAX_LENGTH: 30,
@@ -17,6 +19,8 @@ export const HREF = {
     PASSWORD_RECOVERY_PAGE: "/login/passwrod-recovery",
     PASSWORD_RECOVERY_SEND_PAGE: "/login/passwrod-recovery/check-email",
     PASSWORD_RECOVERY_SUCCESS_PAGE: "/login/passwrod-recovery/password-changed",
+    SET_USER_BIRTHDATE: "/set-data/birthdate",
+    SET_USER_CALI_START_DAY: "/set-data/cali-start-date",
     PROFILE_PAGE: "/profile",
     ERROR_PAGE: "/error",
 }

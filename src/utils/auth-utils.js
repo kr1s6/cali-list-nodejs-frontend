@@ -29,6 +29,22 @@ export async function postRequest(endpoint, requestBody = null) {
     return { response, json };
 }
 
+export async function patchRequest(endpoint, requestBody = null) {
+    console.log("endpoint:" + endpoint);
+    const response = await fetch(endpoint, {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: requestBody ? JSON.stringify(requestBody) : null,
+        credentials: "include",
+    });
+
+    const json = await response.json();
+    console.log("Response status:", response.status);
+    console.log("Json Response:", json);
+
+    return { response, json };
+}
+
 export async function refreshTokenRequest(accessToken) {
     console.log("Refresh token request.");
     const requestBody = {
@@ -92,5 +108,20 @@ export function setAccessToken(token) {
 export function removeAccessToken() {
     console.log("remove access token");
     sessionStorage.removeItem("accessToken");
+}
+
+export function redirectToNextStepAfterLogin(user, router) {
+    console.log("redirectToNextStepAfterLogin function");
+    if (!user.birthdate) {
+        console.log("go to SET_USER_BIRTHDATE");
+        return router.replace(HREF.SET_USER_BIRTHDATE);
+    }
+    if (!user.caliStartDate) {
+        console.log("go to SET_USER_CALI_START_DAY");
+        return router.replace(HREF.SET_USER_CALI_START_DAY);
+    }
+
+    console.log("go to PROFILE_PAGE");
+    return router.replace(HREF.PROFILE_PAGE);
 }
 

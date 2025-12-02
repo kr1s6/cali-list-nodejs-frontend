@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useContext, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { HREF, LOGIN_ENDPOINT, USER_CONSTANTS } from "lib/constants";
-import { handleAuthData, postRequest } from "utils/auth-utils";
+import { handleAuthData, postRequest, redirectToNextStepAfterLogin } from "utils/auth-utils";
 import { AuthContext } from "context/AuthProvider";
 
 export default function Login() {
@@ -45,7 +45,7 @@ export default function Login() {
         // Save user and accessToken
         handleAuthData(json);
         dispatch({ type: "login" });
-        router.push(HREF.PROFILE_PAGE);
+        redirectToNextStepAfterLogin(json.data, router);
       }
       else {
         setErrorValue(json.data);

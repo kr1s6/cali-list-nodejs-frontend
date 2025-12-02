@@ -44,6 +44,7 @@ export default function PasswordRecoveryPage({ params }) {
 
     try {
       const { response, json } = await postRequest(`${RECOVERY_PASSWORDD_REQUEST_ENDPOINT}/${token}`, requestBody);
+      // TODO - być może zmienić post na patch
 
       if (response.ok) {
         setBackendError(null);

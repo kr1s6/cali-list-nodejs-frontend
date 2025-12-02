@@ -10,7 +10,8 @@ export default function RedirectIfAuth({ children }) {
 
   useEffect(() => {
     if (state.isAuthenticated) {
-      router.replace(HREF.MAIN_PAGE);
+      console.log("Redirect to main page from login page if authenticated.");
+      router.replace(HREF.SET_INIT_DATA);
     }
   }, [state.isAuthenticated, router]);
 

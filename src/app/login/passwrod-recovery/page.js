@@ -28,7 +28,7 @@ export default function SendPasswordRecovery() {
   const submitBtnIsDisabled = useMemo(() => (!formIsValid), [formIsValid]);
 
   const sendPasswordRecoveryEmail = async () => {
-    console.log("Password recovery request.");
+    console.log("Request for email with password recovery.");
     const requestBody = {
       email: form.email,
     };
