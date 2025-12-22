@@ -1,8 +1,8 @@
 'use client'
 import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AuthContext } from "context/AuthProvider";
-import { HREF } from "lib/constants";
+import { AuthContext } from "features/shared/context/AuthProvider";
+import { HREF } from "features/shared/constants";
 
 export default function RedirectIfUnauth({ children }) {
   const { state } = useContext(AuthContext);

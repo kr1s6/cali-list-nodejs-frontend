@@ -1,5 +1,5 @@
 'use client'
-import { ThemeContext, themes } from "context/ThemeProvider";
+import { ThemeContext, themes } from "features/shared/context/ThemeProvider";
 import { useContext } from "react";
 
 export default function ThemeChangeBtn() {

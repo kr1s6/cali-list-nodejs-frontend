@@ -1,5 +1,5 @@
 'use client'
-import { HREF, RECOVERY_PASSWORDD_REQUEST_ENDPOINT, STATUS } from "lib/constants";
+import { HREF, RECOVERY_PASSWORDD_REQUEST_ENDPOINT, STATUS } from "features/shared/constants";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { handleAuthData, postRequest } from "utils/auth-utils";

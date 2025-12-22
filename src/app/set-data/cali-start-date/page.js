@@ -1,14 +1,21 @@
 'use client'
-import { HREF, SET_USER_CALI_START_DATE_ENDPOINT } from "lib/constants";
+import { HREF, SET_USER_CALI_START_DATE_ENDPOINT } from "features/shared/constants";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { handleAuthData, patchRequest, redirectToNextStepAfterLogin } from "utils/auth-utils";
+import { getLocalStorageItem } from "utils/local-storage-utils";
 
 export default function SetUserCaliStartDate() {
     const router = useRouter();
     const [backendError, setBackendError] = useState(null);
     const [caliStartDate, setCaliStartDate] = useState("");
+    const [trainingDuration, setTrainingDuration] = useState(getLocalStorageItem("user").trainingDuration || null);
+
+    if (trainingDuration != null) {
+        console.log("Pus from set training duration");
+        router.push(HREF.PROFILE_PAGE);
+    }
 
     const patchUserCaliStartDate = async () => {
         console.log("Set user's cali start date.");
@@ -25,7 +32,7 @@ export default function SetUserCaliStartDate() {
             } else {
                 setBackendError(json.data);
             }
-        } catch(error) {
+        } catch (error) {
             console.log('An error occurred:', error.message);
             router.push(HREF.ERROR_PAGE);
         }

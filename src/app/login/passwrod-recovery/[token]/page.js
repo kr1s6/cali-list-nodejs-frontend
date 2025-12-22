@@ -1,7 +1,7 @@
 'use client'
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { HREF, STATUS, USER_CONSTANTS, RECOVERY_PASSWORDD_REQUEST_ENDPOINT } from "lib/constants";
+import { HREF, STATUS, USER_CONSTANTS, RECOVERY_PASSWORDD_REQUEST_ENDPOINT } from "features/shared/constants";
 import { postRequest } from "utils/auth-utils";
 
 export default function PasswordRecoveryPage({ params }) {

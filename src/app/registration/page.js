@@ -2,9 +2,9 @@
 import Link from "next/link";
 import { useContext, useMemo, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { HREF, REGISTER_ENDPOINT, STATUS, USER_CONSTANTS } from "lib/constants";
-import { handleAuthData, postRequest, redirectToNextStepAfterLogin } from "utils/auth-utils";
-import { AuthContext } from "context/AuthProvider";
+import { handleUserData, postRequest, redirectToNextStepAfterLogin } from "utils/auth-utils";
+import { AuthContext } from "features/shared/context/AuthProvider";
+import { HREF, REGISTER_ENDPOINT, STATUS, USER_CONSTANTS } from "features/shared/constants";
 
 export default function Registration() {
   const [isBackendError, setBackendError] = useState(null);
@@ -53,7 +53,7 @@ export default function Registration() {
       const { response, json } = await postRequest(REGISTER_ENDPOINT, requestBody);
       if (response.ok) {
         setBackendError(null);
-        handleAuthData(json);
+        handleUserData(json);
         dispatch({ type: "login" });
         redirectToNextStepAfterLogin(json.data, router);
       }

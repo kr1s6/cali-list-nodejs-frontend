@@ -1,5 +1,5 @@
 'use client'
-import { HREF, LOGOUT_ENDPOINT, REFRESH_TOKEN_ENDPOINT } from "lib/constants";
+import { HREF, LOGOUT_ENDPOINT, REFRESH_TOKEN_ENDPOINT } from "features/shared/constants";
 
 export const getHeaders = () => {
     const token = getAccessToken();
@@ -52,7 +52,7 @@ export async function refreshTokenRequest(accessToken) {
     };
     const { response, json } = await postRequest(REFRESH_TOKEN_ENDPOINT, requestBody);
     if (response.ok) {
-        setAccessToken(json.accessToken);
+        handleUserData(json);
         console.log("RefreshToken - Response OK!");
         return (true);
     } else {
@@ -83,6 +83,11 @@ export async function logout(router, dispatch) {
     dispatch({ type: "logout" });
 };
 
+export function handleUserData(json){
+    handleAuthData(json);
+    setAccessToken(json.accessToken);
+}
+
 export function handleAuthData(json) {
     localStorage.setItem("user", JSON.stringify(json.data));
     setAccessToken(json.accessToken);
@@ -96,6 +101,13 @@ export function removeUserData() {
 export function getAccessToken() {
     if (typeof window !== "undefined") {
         return sessionStorage.getItem("accessToken");
+    }
+    return null;
+}
+
+export function getValueFromLocalStorage(key) {
+    if (typeof window !== "undefined") {
+        return localStorage.getItem(key);
     }
     return null;
 }
@@ -116,7 +128,7 @@ export function redirectToNextStepAfterLogin(user, router) {
         console.log("go to SET_USER_BIRTHDATE");
         return router.replace(HREF.SET_USER_BIRTHDATE);
     }
-    if (!user.caliStartDate) {
+    if (!user.trainingDuration) {
         console.log("go to SET_USER_CALI_START_DAY");
         return router.replace(HREF.SET_USER_CALI_START_DAY);
     }

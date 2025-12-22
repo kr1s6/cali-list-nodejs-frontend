@@ -1,14 +1,21 @@
 'use client'
-import { HREF, SET_USER_BIRTHDATE_ENDPOINT } from "lib/constants";
+import { HREF, SET_USER_BIRTHDATE_ENDPOINT } from "features/shared/constants";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { handleAuthData, patchRequest, redirectToNextStepAfterLogin } from "utils/auth-utils";
+import { getLocalStorageItem } from "utils/local-storage-utils";
 
 export default function SetUserBirthdate() {
     const router = useRouter();
     const [birthdate, setBirthdate] = useState("");
     const [backendError, setBackendError] = useState(null);
+    const [birthday, setBirthday] = useState(getLocalStorageItem("user").birthdate || null);
+
+    if (birthdate != null) {
+        console.log("Push from set birthday.");
+        router.push(HREF.PROFILE_PAGE);
+    }
 
     const patchUserBirthdate = async () => {
         console.log("Set user's birthdate.");
@@ -25,7 +32,7 @@ export default function SetUserBirthdate() {
             } else {
                 setBackendError(json.data);
             }
-        } catch(error) {
+        } catch (error) {
             console.log('An error occurred:', error.message);
             router.push(HREF.ERROR_PAGE);
         }

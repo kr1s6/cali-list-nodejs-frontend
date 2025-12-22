@@ -2,9 +2,10 @@ export const REGISTER_ENDPOINT = "http://localhost:8080/api/register";
 export const LOGIN_ENDPOINT = "http://localhost:8080/api/login";
 export const LOGOUT_ENDPOINT = "http://localhost:8080/api/logout";
 export const REFRESH_TOKEN_ENDPOINT = "http://localhost:8080/api/refreshToken";
-export const RECOVERY_PASSWORDD_REQUEST_ENDPOINT = "http://localhost:8080/api/password-recovery"
-export const SET_USER_BIRTHDATE_ENDPOINT = "http://localhost:8080/api/set-user-birthdate"
-export const SET_USER_CALI_START_DATE_ENDPOINT = "http://localhost:8080/api/set-user-cali-start-date"
+export const RECOVERY_PASSWORDD_REQUEST_ENDPOINT = "http://localhost:8080/api/password-recovery";
+export const SET_USER_BIRTHDATE_ENDPOINT = "http://localhost:8080/api/set-user-birthdate";
+export const SET_USER_CALI_START_DATE_ENDPOINT = "http://localhost:8080/api/set-user-cali-start-date";
+export const USER_SETTINGS_ENDPOINT = "http://localhost:8080/api/set-user-settings";
 
 export const USER_CONSTANTS = {
     USERNAME_MAX_LENGTH: 30,
@@ -22,6 +23,7 @@ export const HREF = {
     SET_USER_BIRTHDATE: "/set-data/birthdate",
     SET_USER_CALI_START_DAY: "/set-data/cali-start-date",
     PROFILE_PAGE: "/profile",
+    USER_SETTINGS_PAGE: "/profile/user-settings",
     ERROR_PAGE: "/error",
 }
 
