@@ -14,9 +14,7 @@ export async function login(requestBody, router, dispatch) {
     handleUserData(json);
     dispatch({ type: "login" });
     redirectToNextStepAfterLogin(json.data, router);
-    return {
-      ok: true
-    };
+    return { ok: true };
 
   } catch (error) {
     console.log('An error occurred:', error.message);
