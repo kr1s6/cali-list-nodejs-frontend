@@ -47,7 +47,7 @@ export default function useRegisterForm() {
         setIsFormTouched(prev => ({ ...prev, [e.target.name]: true }));
     }
 
-    const userRegistration = async () => {
+    const submit = async () => {
         const requestBody = {
             username: form.username,
             email: form.email,
@@ -71,6 +71,6 @@ export default function useRegisterForm() {
         emailRef,
         handleChange,
         handleOnBlur,
-        userRegistration
+        submit
     };
 }

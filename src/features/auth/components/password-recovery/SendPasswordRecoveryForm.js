@@ -11,7 +11,7 @@ export default function SendPasswordRecoveryForm() {
         submitIsDisabled,
         handleChange,
         handleBlur,
-        sendPasswordRecoveryEmail,
+        submit,
         errorValue
     } = usePasswordRecoveryForm();
 
@@ -36,7 +36,7 @@ export default function SendPasswordRecoveryForm() {
                     <p className="validator-hint">Enter email address.</p>
                 )}
 
-                <button className="btn btn-neutral mt-4" disabled={submitIsDisabled} onClick={sendPasswordRecoveryEmail}>Send email</button>
+                <button className="btn btn-neutral mt-4" disabled={submitIsDisabled} onClick={submit}>Send email</button>
                 {errorValue && (
                     <p className="validator-hint">{errorValue}</p>
                 )}

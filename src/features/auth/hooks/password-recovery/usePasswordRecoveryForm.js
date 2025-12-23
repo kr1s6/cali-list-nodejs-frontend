@@ -2,7 +2,7 @@
 'use client';
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { sendPasswordRecovery } from "../../services/password-recovery/sendPasswordRecoveryService";
+import { sendPasswordRecoveryEmail } from "../../services/password-recovery/sendPasswordRecoveryService";
 
 export default function usePasswordRecoveryForm() {
     const [errorValue, setErrorValue] = useState(null);
@@ -25,11 +25,11 @@ export default function usePasswordRecoveryForm() {
     const handleBlur = () => setTouched({ email: true });
 
     const router = useRouter();
-    const sendPasswordRecoveryEmail = async () => {
+    const submit = async () => {
         const requestBody = {
             email: form.email,
         };
-        const result = await sendPasswordRecovery(requestBody, router);
+        const result = await sendPasswordRecoveryEmail(requestBody, router);
         if (!result.ok) {
             setErrorValue(result.error);
         }
@@ -43,7 +43,7 @@ export default function usePasswordRecoveryForm() {
         submitIsDisabled,
         handleChange,
         handleBlur,
-        sendPasswordRecoveryEmail,
+        submit,
         errorValue,
     };
 }

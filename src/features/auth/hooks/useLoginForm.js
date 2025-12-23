@@ -37,7 +37,7 @@ export default function useLoginForm() {
   }
 
   const router = useRouter();
-  const loginPostRequest = async () => {
+  const submit = async () => {
     const requestBody = {
       email: form.email,
       password: form.password,
@@ -58,6 +58,6 @@ export default function useLoginForm() {
     emailRef,
     handleChange,
     handleOnBlur,
-    loginPostRequest
+    submit
   };
 }

@@ -13,7 +13,7 @@ export default function LoginForm() {
         emailRef,
         handleChange,
         handleOnBlur,
-        loginPostRequest
+        submit
     } = useLoginForm();
 
     return (
@@ -63,7 +63,7 @@ export default function LoginForm() {
                 <button
                     className="btn btn-neutral mt-4"
                     disabled={submitBtnIsDisabled}
-                    onClick={loginPostRequest}>
+                    onClick={submit}>
                     Login
                 </button>
 

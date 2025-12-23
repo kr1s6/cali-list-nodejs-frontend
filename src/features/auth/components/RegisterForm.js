@@ -1,7 +1,7 @@
 'use client';
-
 import { HREF, USER_CONSTANTS } from "features/shared/constants";
 import useRegisterForm from "../hooks/useRegisterForm";
+import Link from "next/link";
 
 export default function RegisterForm() {
     const {
@@ -14,7 +14,8 @@ export default function RegisterForm() {
         emailRef,
         handleChange,
         handleOnBlur,
-        userRegistration } = useRegisterForm();
+        submit
+    } = useRegisterForm();
 
     return (
         <div className="hero min-h-[70vh]">
@@ -92,9 +93,19 @@ export default function RegisterForm() {
                     <p className="validator-hint">Wrong password.</p>
                 )}
 
-                <button id="registerBtn" className="btn btn-neutral mt-4" disabled={submitBtnIsDisabled} onClick={userRegistration}>Register</button>
+                <button
+                    id="registerBtn"
+                    className="btn btn-neutral mt-4"
+                    disabled={submitBtnIsDisabled}
+                    onClick={submit}>
+                    Register
+                </button>
                 {errorValue !== null && (
-                    Object.values(errorValue).map(error => <p className="validator-hint">{error}</p>)
+                    Object.values(errorValue).map((error, index) => (
+                        <p key={index} className="validator-hint">
+                            {error}
+                        </p>
+                    ))
                 )}
 
                 <div className="mt-2 w-full flex justify-end">
@@ -103,5 +114,4 @@ export default function RegisterForm() {
             </fieldset>
         </div>
     );
-
 }
