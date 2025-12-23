@@ -1,5 +1,5 @@
 'use client'
-import { HREF, LOGOUT_ENDPOINT, REFRESH_TOKEN_ENDPOINT } from "lib/constants";
+import { HREF, LOGOUT_ENDPOINT, REFRESH_TOKEN_ENDPOINT } from "features/shared/constants";
 
 export const getHeaders = () => {
     const token = getAccessToken();
@@ -29,6 +29,22 @@ export async function postRequest(endpoint, requestBody = null) {
     return { response, json };
 }
 
+export async function patchRequest(endpoint, requestBody = null) {
+    console.log("endpoint:" + endpoint);
+    const response = await fetch(endpoint, {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: requestBody ? JSON.stringify(requestBody) : null,
+        credentials: "include",
+    });
+
+    const json = await response.json();
+    console.log("Response status:", response.status);
+    console.log("Json Response:", json);
+
+    return { response, json };
+}
+
 export async function refreshTokenRequest(accessToken) {
     console.log("Refresh token request.");
     const requestBody = {
@@ -36,7 +52,7 @@ export async function refreshTokenRequest(accessToken) {
     };
     const { response, json } = await postRequest(REFRESH_TOKEN_ENDPOINT, requestBody);
     if (response.ok) {
-        setAccessToken(json.accessToken);
+        handleUserData(json);
         console.log("RefreshToken - Response OK!");
         return (true);
     } else {
@@ -67,6 +83,11 @@ export async function logout(router, dispatch) {
     dispatch({ type: "logout" });
 };
 
+export function handleUserData(json){
+    handleAuthData(json);
+    setAccessToken(json.accessToken);
+}
+
 export function handleAuthData(json) {
     localStorage.setItem("user", JSON.stringify(json.data));
     setAccessToken(json.accessToken);
@@ -84,6 +105,13 @@ export function getAccessToken() {
     return null;
 }
 
+export function getValueFromLocalStorage(key) {
+    if (typeof window !== "undefined") {
+        return localStorage.getItem(key);
+    }
+    return null;
+}
+
 export function setAccessToken(token) {
     console.log("Set access token");
     sessionStorage.setItem("accessToken", token)
@@ -92,5 +120,20 @@ export function setAccessToken(token) {
 export function removeAccessToken() {
     console.log("remove access token");
     sessionStorage.removeItem("accessToken");
+}
+
+export function redirectToNextStepAfterLogin(user, router) {
+    console.log("redirectToNextStepAfterLogin function");
+    if (!user.birthdate) {
+        console.log("go to SET_USER_BIRTHDATE");
+        return router.replace(HREF.SET_USER_BIRTHDATE);
+    }
+    if (!user.trainingDuration) {
+        console.log("go to SET_USER_CALI_START_DAY");
+        return router.replace(HREF.SET_USER_CALI_START_DAY);
+    }
+
+    console.log("go to PROFILE_PAGE");
+    return router.replace(HREF.PROFILE_PAGE);
 }
 

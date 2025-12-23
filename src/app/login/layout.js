@@ -1,4 +1,4 @@
-import RedirectIfAuth from "components/main-page-redirection";
+import RedirectIfAuth from "components/redirect-if-auth";
 
 export default function LoginLayout({ children }) {
   return (

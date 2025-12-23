@@ -1,4 +1,4 @@
-import RedirectIfUnauth from "components/login-page-redirection";
+import RedirectIfUnauth from "components/redirect-if-not-auth";
 
 export default function ProfileLayout({ children }) {
   return (

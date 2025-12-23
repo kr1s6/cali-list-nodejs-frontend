@@ -128,3 +128,8 @@
     /* var(--color-error) */
   ;
 }
+
+
+.dropdown-hover:hover .dropdown-content {
+  display: block;
+}
